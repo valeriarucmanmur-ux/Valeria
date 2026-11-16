@@ -1164,6 +1164,24 @@ body.onpage .top,body.onpage .sheet,body.onpage .ctrls{visibility:hidden}
   body.nav .tabbar{display:none}
   body[data-sm="half"] #homeBtn,body[data-sm="half"] #fitBtn{display:none}
 }
+
+.rres>*{flex-shrink:0}
+.pill{white-space:nowrap}
+.pickban{position:absolute;z-index:1001;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top,0px));background:var(--ink);color:#fff;border-radius:16px;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-lg);font-weight:700;white-space:nowrap}
+.pickban .btn{height:38px}
+body.picking .top{visibility:hidden}
+.link{min-height:36px;padding:0 4px}
+.sbtn{width:42px;height:42px}
+.seg button{min-height:42px}
+.tog button{width:54px;height:34px}.tog button:after{width:28px;height:28px}.tog button[aria-pressed="true"]:after{left:23px}
+@media (max-width:760px){
+  .chip{height:40px}
+  .pchips .pill{height:40px}
+  .fab{width:42px;height:42px}
+  .hero{aspect-ratio:3/1}
+}
+.hello{position:absolute;z-index:1002;left:50%;transform:translateX(-50%);top:calc(70px + env(safe-area-inset-top,0px));width:min(440px,calc(100% - 24px));background:var(--paper);border-radius:18px;box-shadow:var(--shadow-lg);padding:16px;display:flex;flex-direction:column;gap:8px}
+.hello span{color:var(--muted);font-size:13.5px}
 </style>
 </head>
 <body>
@@ -1183,7 +1201,7 @@ body.onpage .top,body.onpage .sheet,body.onpage .ctrls{visibility:hidden}
 <div class="top">
   <div class="searchbox">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input id="q" type="search" placeholder="Искать: водопад, матча, Сидемен…" autocomplete="off" aria-label="Поиск по местам">
+    <input id="q" type="search" placeholder="Поиск: водопад, закат, Убуд…" autocomplete="off" aria-label="Поиск по местам">
     <button class="sbtn" id="favOnly" aria-pressed="false" title="Только избранное" aria-label="Только избранное"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 17.3 6.2 21l1.6-6.7L2.6 9.8l6.9-.6L12 3l2.5 6.2 6.9.6-5.2 4.5 1.6 6.7z"/></svg></button>
     <button class="sbtn" id="routeBtn" title="Маршрут" aria-label="Построить маршрут"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.5"/></svg></button>
   </div>
@@ -1254,6 +1272,8 @@ body.onpage .top,body.onpage .sheet,body.onpage .ctrls{visibility:hidden}
 </div>
 
 <div class="toast" id="toast" role="status" hidden></div>
+<div class="hello" id="hello" hidden><b>Расстояния считаются от дома по умолчанию</b><span>Живёте в другом месте? Укажите свой дом — тогда «км от дома» и маршруты будут от него. Это хранится только на вашем телефоне.</span><div class="row"><button class="btn pri" id="helloSet">Указать свой дом</button><button class="btn" id="helloNo">Не нужно</button></div></div>
+<div class="pickban" id="pickBan" hidden><span>Нажмите на карте, где ваш дом</span><button class="btn" id="pickCancel">Отмена</button></div>
 <div class="navban" id="navBan" hidden><div class="nb-ic" id="nbIc"></div><div class="nb-tx"><b id="nbDist"></b><span id="nbText"></span><small id="nbThen"></small></div>
   <button class="nb-snd" id="nbSnd" aria-label="Голосовые подсказки"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="w" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path class="x" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button></div>
 <div class="navbar" id="navBar" hidden><div class="nv-l"><b id="nvTime"></b><span id="nvInfo"></span></div><button class="btn" id="nvGm" aria-label="Открыть в Google Maps">Google Maps</button><button class="btn stop" id="nvStop">Завершить</button></div>
@@ -1349,17 +1369,17 @@ L.control.scale({imperial:false,position:"bottomright"}).addTo(map);
 map.attributionControl.getContainer().addEventListener("click",e=>{if(e.target.tagName!=="A")e.currentTarget.classList.toggle("open")});
 // Esri World Topographic Map: relief, coastline, roads, street names. crossOrigin lets the service worker cache tiles for offline use.
 L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-  {maxZoom:19,maxNativeZoom:17,minZoom:8,crossOrigin:true,keepBuffer:2,bounds:BOUNDS.pad(.3)}).addTo(map);
+  {maxZoom:19,maxNativeZoom:17,minZoom:8,crossOrigin:true,keepBuffer:2,bounds:BOUNDS.pad(1.5)}).addTo(map);
 const isPhone=()=>innerWidth<=760;
 const sheet=$("#sheet");
 // Phone sheet snap heights: peek shows the header, half splits screen with the map, full stops under the search bar.
 const topBottom=()=>Math.round($(".top").getBoundingClientRect().bottom+8);
 const TABH=()=>isPhone()&&!document.body.classList.contains("nav")?($("#tabbar").offsetHeight||0):0;
-const snapH=m=>m==="peek"?($("#vList").hidden?124:200):m==="half"?Math.round(innerHeight*.5):innerHeight-topBottom()-TABH();
+const snapH=m=>m==="peek"?($("#vList").hidden?124:200):m==="half"?Math.round(Math.max(250,Math.min(innerHeight*.5,innerHeight-topBottom()-TABH()-190))):innerHeight-topBottom()-TABH();
 let sMode="peek";
 function applyH(h,anim){sheet.style.transition=anim?"":"none";sheet.style.height=h+"px";document.body.style.setProperty("--sh",(h+TABH())+"px");document.body.classList.toggle("sfull",h>innerHeight*.62)}
 function setSheet(m){if(!isPhone())return;sMode=m;sheet.dataset.mode=m;document.body.dataset.sm=m;applyH(snapH(m),true);if(m!=="full")document.querySelectorAll(".list,.card,.rres").forEach(x=>{if(m==="peek")x.scrollTop=0})}
-const padFor=m=>isPhone()?{paddingTopLeft:[24,topBottom()+44],paddingBottomRight:[24,snapH(m)+TABH()+24]}:{paddingTopLeft:[440,90],paddingBottomRight:[80,40]};
+const padFor=m=>isPhone()?{paddingTopLeft:[24,topBottom()+24],paddingBottomRight:[24,snapH(m)+TABH()+20]}:{paddingTopLeft:[440,90],paddingBottomRight:[80,110]};
 // Keep the point visible beside the sheet: shift the map centre left (desktop) or up into the free area (phone).
 function flyCenter(ll,z,m){let off;if(isPhone()){const top=topBottom(),bot=innerHeight-snapH(m||"half")-TABH();off=L.point(0,(top+bot)/2-innerHeight/2)}else off=L.point(212,0);
   map.flyTo(map.unproject(map.project(ll,z).subtract(off),z),z,{duration:.7})}
@@ -1402,7 +1422,7 @@ $("#sort").onchange=e=>{state.sort=e.target.value;render()};
 $("#reset").onclick=()=>{Object.assign(state,{q:"",cats:new Set(),region:"",price:"",srcs:new Set(),favOnly:false,hideVisited:false,openNow:false,ids:null,idsName:"",sort:"region"});$("#q").value="";$("#region").value="";$("#price").value="";$("#sort").value="region";render();fitIsland()};
 $("#openNow").onclick=()=>{state.openNow=!state.openNow;render()};
 $("#lockNow").onclick=()=>{try{localStorage.removeItem("bali-key")}catch(e){}location.reload()};
-$("#grab").onclick=()=>setSheet(sMode==="half"?"full":"half");
+$("#grab").onclick=()=>setSheet(sMode==="peek"?"half":sMode==="half"?"full":"peek");
 $("#fltBtn").onclick=e=>{const h=e.currentTarget.closest(".vhead");h.classList.toggle("open");e.currentTarget.setAttribute("aria-expanded",h.classList.contains("open"));if(h.classList.contains("open")&&sMode!=="full")setSheet("full")};
 // tap on a header of a collapsed sheet opens it halfway
 sheet.addEventListener("click",e=>{if(isPhone()&&sMode==="peek"&&e.target.closest(".vhead")&&!e.target.closest("button,input,select,a"))setSheet("half")});
@@ -1430,16 +1450,21 @@ function visible(){return PLACES.filter(p=>{
   if(state.openNow&&!openInfo(p)?.open)return false;
   if(state.favOnly&&!favs.has(p.id))return false;
   if(state.hideVisited&&visited.has(p.id))return false;
-  if(state.q&&!(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat).toLowerCase().includes(state.q))return false;
+  if(state.q&&!qMatch(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" "),state.q))return false;
   return true})}
+// Cyrillic queries also match Latin names: «улуват» → uluwat, «убуд» → ubud
+const TR={а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"e",ж:"j",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"h",ц:"ts",ч:"c",ш:"sh",щ:"sh",ъ:"",ы:"y",ь:"",э:"e",ю:"yu",я:"ya"};
+function qVariants(q){if(!/[а-яё]/.test(q))return [q];const a=[...q].map(c=>TR[c]??c).join("");return [q,a,a.replace(/v/g,"w"),a.replace(/c/g,"ch"),a.replace(/y/g,"i"),a.replace(/ya/g,"ia").replace(/yu/g,"iu")]}
+const qMatch=(text,q)=>{const t=text.toLowerCase();return qVariants(q).some(v=>t.includes(v))};
 const fmtKm=k=>k<10?k.toFixed(1).replace(".",",")+" км":Math.round(k)+" км";
 function itemHTML(p){return `<button class="item ${state.sel===p.id?"on":""}" data-id="${p.id}">${p.thumb?`<img class="thumb" loading="lazy" src="${p.thumb}" alt="" data-cat="${esc(p.cat)}">`:`<span class="noimg" style="background:${col(p.cat)}">${svg(p.cat,26)}</span>`}<span style="min-width:0"><b>${esc(p.name)}${favs.has(p.id)?' <span style="color:#e0a100">★</span>':""}${visited.has(p.id)?' <span style="color:var(--faint)">✓</span>':""}</b><span class="sub"><i class="dot" style="background:${col(p.cat)}"></i><span>${esc(p.cat)} · ${esc(p.area)}</span></span><span class="info">${p.rating?`<span><span class="stars">★ ${String(p.rating).replace(".",",")}</span> (${p.reviews.toLocaleString("ru-RU")})</span>`:""}${p.level!==null&&p.level!==undefined?`<span class="tag">${PRICE_TXT[p.level]}</span>`:""}<span>${fmtKm(p.homeKm)} от дома</span>${p.isNew?'<span class="tag new">новое</span>':""}</span></span></button>`}
 function render(fit){
   document.querySelectorAll("#cats [data-cat]").forEach(b=>b.setAttribute("aria-pressed",state.cats.has(b.dataset.cat)));
-  $("#cats [data-all]").setAttribute("aria-pressed",!state.cats.size);
+  $("#cats [data-all]").setAttribute("aria-pressed",!state.cats.size&&!state.ids);
   document.querySelectorAll("#srcs [data-src]").forEach(b=>b.setAttribute("aria-pressed",state.srcs.has(b.dataset.src)));
   $("#visitedHide").setAttribute("aria-pressed",state.hideVisited);$("#favOnly").setAttribute("aria-pressed",state.favOnly);
   let v=visible();
+  if(typeof renderNear==="function"&&window.__v2)renderNear();
   $("#count").textContent=state.ids?`«${state.idsName}» · ${v.length}`:`Показано ${v.length} из ${PLACES.length}`;$("#openNow").setAttribute("aria-pressed",state.openNow);
   cluster.clearLayers();cluster.addLayers(v.map(p=>markers[p.id]));
   let html="";
@@ -1471,7 +1496,7 @@ const ICON={
  close:'<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.4" fill="none"><path d="M6 6l12 12M18 6 6 18"/></svg>'
 };
 let cardFrom=null;
-function openPlace(id,fly){if(!$("#vRoute").hidden)cardFrom="vRoute";else if(!$("#vTrip").hidden)cardFrom="vTrip";else if($("#vCard").hidden)cardFrom=null;
+function openPlace(id,fly){if($("#vCard").hidden)history.pushState({v2:"card"},"");if(!$("#vRoute").hidden)cardFrom="vRoute";else if(!$("#vTrip").hidden)cardFrom="vTrip";else if($("#vCard").hidden)cardFrom=null;
   const isHome=id==="home";const p=isHome?HOME:PLACES.find(x=>x.id===id);if(!p)return;
   const prev=state.sel;state.sel=id;
   if(prev!==null&&prev!=="home"&&markers[prev])markers[prev].setIcon(pinIcon(PLACES.find(x=>x.id===prev)));
@@ -1487,7 +1512,7 @@ function openPlace(id,fly){if(!$("#vRoute").hidden)cardFrom="vRoute";else if(!$(
     <div class="actions"><button class="act pri" id="hFrom"><span class="c">${ICON.route}</span>Маршрут отсюда</button><a class="act" href="${HOME.gm}" target="_blank" rel="noopener"><span class="c">${ICON.gmap}</span>Google Maps</a><button class="act" id="hNear"><span class="c">${ICON.pin}</span>Что рядом</button><button class="act" id="hCopy"><span class="c">${ICON.check}</span>Plus Code</button></div>
     <div class="home-note">Отсюда считается «км от дома» в списке. Нажмите «Маршрут отсюда» и выберите любое место — карта посчитает путь на байке.</div>
     <div class="facts"><div class="fact">${ICON.pin}<div>${HOME.lat.toFixed(5)}, ${HOME.lng.toFixed(5)}<small>Plus Code: <span id="pc">${esc(HOME.plus)}</span></small></div></div></div></div>`;
-    $("#hFrom").onclick=()=>startRoute("home",null);
+    $("#hFrom").onclick=()=>startRoute("home",null,true);
     $("#hNear").onclick=()=>{state.sort="near";$("#sort").value="near";render();showView("vList");setSheet("full")};
     $("#hCopy").onclick=async e=>{try{await navigator.clipboard.writeText(HOME.plus);e.currentTarget.lastChild.textContent="Скопировано"}catch(err){const r=document.createRange();r.selectNodeContents($("#pc"));getSelection().removeAllRanges();getSelection().addRange(r)}};
   }else{
@@ -1524,10 +1549,11 @@ function openPlace(id,fly){if(!$("#vRoute").hidden)cardFrom="vRoute";else if(!$(
       <div class="src"><span>Нашли в: ${esc(p.srcLabel)}</span>${(p.sources||[]).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u.replace(/^https?:\/\/(www\.)?/,"").slice(0,70))}</a>`).join("")}</div>
     </div>`;
     $("#cRoute").onclick=()=>startRoute("home",id);
-    $("#cFromHome").onclick=()=>startRoute("home",id);
+    $("#cFromHome").onclick=()=>startRoute("home",id,true);
     $("#copy").onclick=async e=>{const t=$("#coord").textContent;try{await navigator.clipboard.writeText(t);e.target.textContent="скопировано"}catch(err){const r=document.createRange();r.selectNodeContents($("#coord"));getSelection().removeAllRanges();getSelection().addRange(r);e.target.textContent="выделено"}};
-    $("#cFav").onclick=()=>{toggleFav(id);openPlace(id,false);render()};
-    $("#cVis").onclick=()=>{toggleVisited(id);openPlace(id,false);render();renderNear()};
+    const setBtn=(b,on,t)=>{b.setAttribute("aria-pressed",on);b.lastChild.textContent=t};
+    $("#cFav").onclick=e=>{toggleFav(id);setBtn(e.currentTarget,favs.has(id),favs.has(id)?"В избранном":"Избранное");markers[id].setIcon(pinIcon(p));render()};
+    $("#cVis").onclick=e=>{toggleVisited(id);setBtn(e.currentTarget,visited.has(id),visited.has(id)?"Был(а)":"Был(а)?");markers[id].setIcon(pinIcon(p));render();renderNear()};
     $("#cTrip").onclick=()=>addToTrip(id);
     $("#cShare").onclick=()=>shareLink(p.name,"#p"+id);
     let nt;$("#cNote").oninput=e=>{clearTimeout(nt);nt=setTimeout(()=>{const v=e.target.value.trim();if(v)notes[id]=v;else delete notes[id];store.set("bali-notes",notes)},400)};
@@ -1535,7 +1561,7 @@ function openPlace(id,fly){if(!$("#vRoute").hidden)cardFrom="vRoute";else if(!$(
     const G2=$("#gal");if(G2&&gal.length>1)G2.addEventListener("scroll",()=>{const k=Math.round(G2.scrollLeft/G2.clientWidth);document.querySelectorAll("#gdots i").forEach((d,j)=>d.classList.toggle("on",j===k));$("#gcred").textContent="Фото: "+(gal[k]||gal[0]).a},{passive:true});
     const it=document.querySelector(`.item[data-id="${id}"]`);if(it)it.classList.add("on");
   }
-  $("#cBack").onclick=()=>{deselect();if(cardFrom){const v=cardFrom;cardFrom=null;showView(v);setSheet("half");return}showMarkers(true);showView("vList");setSheet("half")};
+  $("#cBack").onclick=()=>{deselect();if(cardFrom){const v=cardFrom;cardFrom=null;showMarkers(false);showView(v);setSheet("half");return}showMarkers(true);showView("vList");setSheet("half")};
   c.scrollTop=0;showView("vCard");setSheet("half");
 }
 
@@ -1577,12 +1603,12 @@ const routeLayer=L.layerGroup().addTo(map);
 // while a route is shown, hide the other places (like Google Maps) so the line stays readable
 function showMarkers(on){if(on&&!map.hasLayer(cluster))map.addLayer(cluster);else if(!on&&map.hasLayer(cluster))map.removeLayer(cluster)}
 const rState={a:null,b:null};
-const ptOf=k=>k==="home"?{lat:HOME.lat,lng:HOME.lng,name:"Дом · "+HOME.name}:k==="me"?{lat:me.lat,lng:me.lng,name:"Моё местоположение"}:(()=>{const p=PLACES.find(x=>x.id===k);return {lat:p.lat,lng:p.lng,name:p.name}})();
-function startRoute(a,b){if(a==="home"&&me&&me.bali)a="me";rState.a=a;rState.b=b;showView("vRoute");setSheet(a===null||b===null?"full":"half");$("#rA").value=a!==null?ptOf(a).name:"";$("#rB").value=b!==null?ptOf(b).name:"";if(a===null)$("#rA").focus();else if(b===null)$("#rB").focus();computeRoute()}
+const ptOf=k=>k==="home"?{lat:HOME.lat,lng:HOME.lng,name:"Дом"}:k==="me"?{lat:me.lat,lng:me.lng,name:"Моё местоположение"}:(()=>{const p=PLACES.find(x=>x.id===k);return {lat:p.lat,lng:p.lng,name:p.name}})();
+function startRoute(a,b,keepHome){if($("#vRoute").hidden)history.pushState({v2:"route"},"");if(a==="home"&&!keepHome&&me&&me.bali)a="me";if(tab!=="map")switchTab("map");rState.a=a;rState.b=b;showView("vRoute");setSheet(a===null||b===null?"full":"half");$("#rA").value=a!==null?ptOf(a).name:"";$("#rB").value=b!==null?ptOf(b).name:"";if(a===null)$("#rA").focus();else if(b===null)$("#rB").focus();computeRoute()}
 $("#routeBtn").onclick=()=>startRoute("home",state.sel!==null&&state.sel!=="home"?state.sel:null);
 $("#routeClose").onclick=()=>{stopNav();curRoute=null;routeLayer.clearLayers();showMarkers(true);rState.a=rState.b=null;deselect();showView("vList");setSheet("peek")};
 $("#swap").onclick=()=>{[rState.a,rState.b]=[rState.b,rState.a];$("#rA").value=rState.a!==null?ptOf(rState.a).name:"";$("#rB").value=rState.b!==null?ptOf(rState.b).name:"";computeRoute()};
-function setupSugg(inp,box,key){let k=-1;const opts=()=>{const q=inp.value.trim().toLowerCase();const all=(me&&me.bali?[{id:"me",name:"Моё местоположение",cat:null,me:1}]:[]).concat([{id:"home",name:"Дом · "+HOME.name,cat:null}]).concat(PLACES.map(p=>({id:p.id,name:p.name,cat:p.cat,area:p.area})));return all.filter(o=>!q||o.name.toLowerCase().includes(q)||(o.area||"").toLowerCase().includes(q)).slice(0,30)};
+function setupSugg(inp,box,key){let k=-1;const opts=()=>{const q=inp.value.trim().toLowerCase();const all=(me&&me.bali?[{id:"me",name:"Моё местоположение",cat:null,me:1}]:[]).concat([{id:"home",name:"Дом",cat:null}]).concat(PLACES.map(p=>({id:p.id,name:p.name,cat:p.cat,area:p.area})));return all.filter(o=>!q||qMatch(o.name+" "+(o.area||""),q)).slice(0,30)};
   const draw=()=>{const o=opts();box.innerHTML=o.map((x,i)=>`<button data-k="${x.id}" class="${i===k?"k":""}"><i style="background:${x.cat?col(x.cat):x.me?"#2f6fde":"#23201c"}"></i>${esc(x.name)}</button>`).join("")||'<div class="empty" style="padding:12px">Нет совпадений</div>';box.hidden=false};
   inp.addEventListener("focus",()=>{k=-1;inp.select();draw();setSheet("full")});inp.addEventListener("input",()=>{k=-1;draw()});
   inp.addEventListener("keydown",e=>{const o=opts();if(e.key==="ArrowDown"){k=Math.min(k+1,o.length-1);draw();e.preventDefault()}else if(e.key==="ArrowUp"){k=Math.max(k-1,0);draw();e.preventDefault()}else if(e.key==="Enter"&&o.length){choose(o[Math.max(k,0)].id)}else if(e.key==="Escape"){box.hidden=true}});
@@ -1625,10 +1651,10 @@ async function computeRoute(o={}){const quiet=!!o.quiet;
   const leg=byClass.map((v,i)=>v/tot>.03?`<span><i style="background:${CLASSC[i]}"></i>${CLASSN[i]} ${Math.round(v/tot*100)}%</span>`:"").join("");
   const lo=secs*0.9,hi=secs*1.35;
   box.innerHTML=`<div class="big"><strong>${fmtDur(secs)}</strong><span>${(meters/1000).toFixed(1).replace(".",",")} км на байке</span></div>
+   <div class="row"><button class="btn pri go" id="rGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button><a class="btn" href="${gmUrl}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${rState.b!=="me"?`<button class="btn" id="rBack">${ICON.back}К месту</button>`:""}${offlineOK()?`<button class="btn" id="rOff">Сохранить карту офлайн</button>`:""}</div>
    <div class="steps"><div>Обычно ${fmtDur(lo)} – ${fmtDur(hi)}: в Чангу, Убуде и на Буките в часы пик дорога дольше.</div></div>
    <div class="bar">${bars}</div><div class="legend2">${leg}</div>
    ${(walkA>300||walkB>300)?`<div class="warn">${walkA>300?`Начальная точка в ${Math.round(walkA)} м от ближайшей дороги на карте. `:""}${walkB>300?`Последние ${Math.round(walkB)} м до места — пешком или по тропе.`:""}</div>`:""}
-   <div class="row"><button class="btn pri go" id="rGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button><a class="btn" href="${gmUrl}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${rState.b!=="me"?`<button class="btn" id="rBack">${ICON.back}К месту</button>`:""}${offlineOK()?`<button class="btn" id="rOff">Сохранить карту офлайн</button>`:""}</div>
    <details class="tbt"><summary>Пошагово · ${ST.mans.length-1} ${plural(ST.mans.length-1,"поворот","поворота","поворотов")}</summary><ol>${ST.mans.map((m,i)=>`<li><button data-m="${i}"><span class="ti">${arrowSVG(m.a)}</span><span><b>${esc(m.a==="finish"?"Прибытие: "+B.name:m.text)}</b><small>${fmtDist(m.cum)} от старта</small></span></button></li>`).join("")}</ol></details>
    <div class="steps"><div>Скорость для байка: трасса 45–55 км/ч, главные дороги 40, местные 25–30, улочки 20. Пробки, дождь и паромы не учитываются.</div></div>`;
   if($("#rBack"))$("#rBack").onclick=()=>{const id=rState.b;if(id!==null&&id!=="me"){showMarkers(true);openPlace(id,false)}};
@@ -1647,7 +1673,7 @@ function drawMe(){const ll=[me.lat,me.lng];
   else{meCircle.setLatLng(ll).setRadius(Math.min(me.acc||50,600));meMarker.setLatLng(ll)}
   const el=meMarker.getElement();if(el){const c=el.querySelector(".cone");if(me.hd!=null){c.style.display="block";c.style.transform=`rotate(${me.hd}deg)`}else c.style.display="none"}}
 // keep the dot inside the free part of the screen (above the sheet / lower third while navigating)
-function viewCenter(ll,z){let off;if(nav)off=L.point(0,-innerHeight*.2);else if(isPhone()){const top=topBottom(),bot=innerHeight-snapH(sMode==="full"?"half":sMode)-TABH();off=L.point(0,(top+bot)/2-innerHeight/2)}else off=L.point(212,0);
+function viewCenter(ll,z){let off;if(nav)off=L.point(0,innerHeight*.18);else if(isPhone()){const top=topBottom(),bot=innerHeight-snapH(sMode==="full"?"half":sMode)-TABH();off=L.point(0,(top+bot)/2-innerHeight/2)}else off=L.point(212,0);
   return map.unproject(map.project(ll,z).subtract(off),z)}
 function onFix(pos){const c=pos.coords;const n={lat:c.latitude,lng:c.longitude,acc:c.accuracy,spd:c.speed,hd:null,t:Date.now()};
   if(c.heading!=null&&!isNaN(c.heading)&&(c.speed||0)>1)n.hd=c.heading;
@@ -1674,9 +1700,9 @@ map.on("dragstart",()=>{if(follow){follow=false;$("#locBtn").classList.remove("o
 
 /* ---------------- map layers: схема / спутник ---------------- */
 const ESRI="https://server.arcgisonline.com/ArcGIS/rest/services/";
-const satLayers=[L.tileLayer(ESRI+"World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:18,minZoom:8,crossOrigin:true,keepBuffer:2,bounds:BOUNDS.pad(.3)}),
-  L.tileLayer(ESRI+"Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:18,minZoom:8,crossOrigin:true,opacity:.9,bounds:BOUNDS.pad(.3)}),
-  L.tileLayer(ESRI+"Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:18,minZoom:8,crossOrigin:true,bounds:BOUNDS.pad(.3)})];
+const satLayers=[L.tileLayer(ESRI+"World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:18,minZoom:8,crossOrigin:true,keepBuffer:2,bounds:BOUNDS.pad(1.5)}),
+  L.tileLayer(ESRI+"Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:18,minZoom:8,crossOrigin:true,opacity:.9,bounds:BOUNDS.pad(1.5)}),
+  L.tileLayer(ESRI+"Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:18,minZoom:8,crossOrigin:true,bounds:BOUNDS.pad(1.5)})];
 function setLayer(sat){satLayers.forEach(l=>sat?l.addTo(map):map.removeLayer(l));if(sat)satLayers.forEach(l=>l.bringToBack());$("#layerBtn").classList.toggle("on",sat);
   $("#layerBtn").setAttribute("aria-pressed",sat);store.set("bali-sat",sat)}
 $("#layerBtn").onclick=()=>{const sat=!store.get("bali-sat",false);setLayer(sat);toast(sat?"Спутник":"Схема")};
@@ -1716,8 +1742,9 @@ document.addEventListener("visibilitychange",()=>{if(nav&&!document.hidden)keepA
 const canSpeak=()=>"speechSynthesis" in window;
 function say(t){if(!nav||!nav.voice||!canSpeak())return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="ru-RU";u.rate=1.05;speechSynthesis.speak(u)}catch(e){}}
 const sayDist=m=>m<950?"Через "+(Math.round(m/50)*50||50)+" метров":"Через "+(m/1000).toFixed(1).replace(".",",")+" километра";
-async function startNav(){
+async function startNav(){if(tab!=="map")switchTab("map");
   if(!me||Date.now()-me.t>15000){toast("Определяю, где вы…");try{await waitFix()}catch(e){toast("Не удалось определить местоположение. Включите геолокацию и попробуйте ещё раз.");return}}
+  if(tab!=="map")switchTab("map");
   if(!me.bali){toast("Вы сейчас не на Бали — навигация работает только на острове");return}
   nav={idx:0,off:0,lastRe:0,voice:store.get("bali-voice",true),said:new Set(),done:new Set(),arrived:false};
   if(curRoute&&curRoute.trip){if(curRoute.A.name!=="Моё местоположение")await computeTrip(curRoute.trip,{quiet:true,from:"me",stops:curRoute.remaining})}
@@ -1802,16 +1829,17 @@ const HOME0={...HOME};
 function applyHome(h){Object.assign(HOME,h||HOME0);PLACES.forEach(p=>p.homeKm=hav(HOME.lat,HOME.lng,p.lat,p.lng)/1000);homeM.setLatLng([HOME.lat,HOME.lng]);render();renderNear()}
 const savedHome=store.get("bali-home",null);if(savedHome)applyHome(savedHome);
 let pickHome=false;
-map.on("click",e=>{if(!pickHome)return;pickHome=false;document.body.classList.remove("picking");
+function endPick(){pickHome=false;document.body.classList.remove("picking");$("#pickBan").hidden=true}
+map.on("click",e=>{if(!pickHome)return;endPick();
   const h={name:"Мой дом",addr:"Точка, выбранная на карте",plus:"",lat:+e.latlng.lat.toFixed(6),lng:+e.latlng.lng.toFixed(6)};h.gm=`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}`;
   store.set("bali-home",h);applyHome(h);toast("Дом сохранён на этом устройстве")});
 
 /* ---------- tabs ---------- */
 let tab="map";const pages={places:"#pgPlaces",trips:"#pgTrips",me:"#pgMe",more:"#pgMore"};
-function switchTab(t){if(nav&&t!=="map")return;tab=t;document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.toggleAttribute("aria-current",b.dataset.tab===t));
+function switchTab(t,fromPop){if(nav&&t!=="map")return;if(pickHome)endPick();if(!fromPop&&t!==tab&&t!=="map")history.pushState({v2:"tab"},"");tab=t;document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.toggleAttribute("aria-current",b.dataset.tab===t));
   Object.entries(pages).forEach(([k,sel])=>$(sel).hidden=k!==t);document.body.classList.toggle("onpage",t!=="map");
   if(t==="places")renderPlaces();if(t==="trips")renderTrips();if(t==="me")renderMe();if(t==="more")renderMore();
-  if(t!=="map"){const pg=$(pages[t]);pg.querySelector(".pbody").scrollTop=0}else if(isPhone())applyH(snapH(sMode),false)}
+  if(t!=="map"){if(t!=="places"){const pg=$(pages[t]);pg.querySelector(".pbody").scrollTop=0}}else if(isPhone())applyH(snapH(sMode),false)}
 $("#tabbar").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b)switchTab(b.dataset.tab)});
 function closeRouting(){if(nav)return;if(!$("#vTrip").hidden||!$("#vRoute").hidden){curTrip=null;curRoute=null;routeLayer.clearLayers();rState.a=rState.b=null;showMarkers(true)}}
 function goToPlace(id){const fromPage=tab!=="map";switchTab("map");if(fromPage)closeRouting();openPlace(id,true)}
@@ -1840,12 +1868,12 @@ function collections(){const C=[];
   C.forEach(c=>{if(!c.keepOrder)c.ps=[...c.ps].sort(byLook)});return C}
 const pstate={q:"",f:new Set(),view:null,sort:"rating"};
 function pfilter(ps){return ps.filter(p=>{
-  if(pstate.q&&!(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" ")).toLowerCase().includes(pstate.q))return false;
+  if(pstate.q&&!qMatch(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" "),pstate.q))return false;
   if(pstate.f.has("open")&&!openInfo(p)?.open)return false;if(pstate.f.has("free")&&p.level!==0)return false;
   if(pstate.f.has("new")&&visited.has(p.id))return false;if(pstate.f.has("fav")&&!favs.has(p.id))return false;return true})}
 function psort(ps){const s=[...ps];if(pstate.sort==="near")s.sort((a,b)=>(kmFromMe(a)??a.homeKm)-(kmFromMe(b)??b.homeKm));else if(pstate.sort==="rating")s.sort(byRating);return s}
 function renderPlaces(){const B=$("#placesBody");
-  $("#pChips").innerHTML=[["near",me&&me.bali?"Ближе ко мне":"Ближе к дому"],["open","Открыто сейчас"],["free","Бесплатно"],["new","Ещё не была"],["fav","Избранное"]]
+  $("#pChips").innerHTML=[["near",me&&me.bali?"Ближе ко мне":"Ближе к дому"],["open","Открыто сейчас"],["free","Бесплатно"],["new","Ещё не был(а)"],["fav","Избранное"]]
     .map(([k,t])=>`<button class="pill" data-pf="${k}" aria-pressed="${k==="near"?pstate.sort==="near":pstate.f.has(k)}">${t}</button>`).join("");
   const filtering=pstate.q||pstate.f.size||pstate.sort==="near";
   if(pstate.view||filtering){const v=pstate.view||{t:"Результаты",ps:PLACES};const ps=psort(pfilter(v.ps));
@@ -1853,7 +1881,7 @@ function renderPlaces(){const B=$("#placesBody");
       ${ps.length?`<button class="pill" id="pOnMap">${ICON.gmap}На карте</button>`:""}</div>
       ${v.desc?`<p class="ddesc">${esc(v.desc)}</p>`:""}
       <div class="grid">${ps.map(p=>pcard(p)).join("")||'<div class="empty">Ничего не нашлось. Попробуйте убрать фильтры.</div>'}</div>`;
-    if($("#pBack"))$("#pBack").onclick=()=>{pstate.view=null;renderPlaces()};
+    if($("#pBack"))$("#pBack").onclick=()=>{pstate.view=null;renderPlaces()};B.scrollTop=pstate.dscroll||0;pstate.dscroll=0;
     if($("#pOnMap"))$("#pOnMap").onclick=()=>{showOnMap(v.t,ps.map(p=>p.id))};return}
   const C=collections();
   const cats=ALLC.map(c=>`<button class="catb" data-pv="cat:${esc(c)}"><i style="background:${col(c)}">${svg(c,20)}</i><span>${esc(c)}</span><small>${catCount[c]}</small></button>`).join("");
@@ -1863,11 +1891,12 @@ function renderPlaces(){const B=$("#placesBody");
      <div class="hscroll">${c.ps.slice(0,10).map(p=>pcard(p,{small:0})).join("")}</div></section>`).join("")+
     `<section class="coll"><div class="chd"><h2>Категории</h2></div><div class="cats">${cats}</div></section>
      <section class="coll"><div class="chd"><h2>Районы</h2></div><div class="regs">${regs}</div></section>`;
-  B.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.pv.split(/:(.*)/s);
+  if(pstate.back!=null){B.scrollTop=pstate.back;pstate.back=null}
+  B.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{pstate.back=B.scrollTop;const [k,v]=b.dataset.pv.split(/:(.*)/s);
     if(k==="cat")pstate.view={t:v,ps:PLACES.filter(p=>p.cat===v)};
     else if(k==="reg")pstate.view={t:v,ps:PLACES.filter(p=>p.region===v)};
     else{const c=collections()[+v];pstate.view={t:c.t,ps:c.ps}}
-    renderPlaces();$("#placesBody").scrollTop=0})}
+    pstate.dscroll=0;renderPlaces();history.pushState({v2:"drill"},"")})}
 $("#pChips").addEventListener("click",e=>{const b=e.target.closest("[data-pf]");if(!b)return;const k=b.dataset.pf;
   if(k==="near")pstate.sort=pstate.sort==="near"?"rating":"near";else pstate.f.has(k)?pstate.f.delete(k):pstate.f.add(k);renderPlaces()});
 $("#pq").addEventListener("input",e=>{pstate.q=e.target.value.trim().toLowerCase();renderPlaces()});
@@ -1877,7 +1906,7 @@ function showOnMap(title,ids){closeRouting();Object.assign(state,{q:"",cats:new 
 
 /* ---------- near carousel in the map sheet ---------- */
 function renderNear(){const el=$("#near");if(!el)return;const fromMe=me&&me.bali;
-  const ps=[...PLACES].filter(p=>!visited.has(p.id)).sort((a,b)=>fromMe?kmFromMe(a)-kmFromMe(b):a.homeKm-b.homeKm).slice(0,10);
+  const vis=new Set(visible().map(p=>p.id));const ps=PLACES.filter(p=>vis.has(p.id)&&!visited.has(p.id)).sort((a,b)=>fromMe?kmFromMe(a)-kmFromMe(b):a.homeKm-b.homeKm).slice(0,10);
   $("#nearT").textContent=fromMe?"Рядом с вами":"Рядом с домом";
   el.innerHTML=ps.map(p=>`<button class="nc" data-near="${p.id}">${p.thumb?`<img src="${p.thumb}" alt="" loading="lazy" data-cat="${esc(p.cat)}">`:`<span class="noimg" style="background:${col(p.cat)}">${svg(p.cat,20)}</span>`}<span><b>${esc(p.name)}</b><small>${fmtKm(fromMe?kmFromMe(p):p.homeKm)} · ${esc(p.cat)}</small></span></button>`).join("")}
 $("#near").addEventListener("click",e=>{const b=e.target.closest("[data-near]");if(b)openPlace(+b.dataset.near,true)});
@@ -1909,7 +1938,7 @@ function renderTrips(){const B=$("#tripsBody");
     B.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{t.stops.splice(+b.dataset.rm,1);save()});
     B.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{t.stops.push(+b.dataset.add);activeTrip=t.id;save()});
     const tq=$("#tq"),ts=$("#tsugg");tq.oninput=()=>{const q=tq.value.trim().toLowerCase();if(!q){ts.innerHTML="";return}
-      ts.innerHTML=PLACES.filter(p=>!t.stops.includes(p.id)&&(p.name+" "+p.area+" "+p.cat).toLowerCase().includes(q)).slice(0,8).map(p=>`<button data-add2="${p.id}"><i style="background:${col(p.cat)}"></i>${esc(p.name)}<small>${esc(p.area)}</small></button>`).join("")||'<div class="empty" style="padding:10px">Не нашлось</div>'};
+      ts.innerHTML=PLACES.filter(p=>!t.stops.includes(p.id)&&qMatch(p.name+" "+p.area+" "+p.cat+" "+p.region,q)).slice(0,8).map(p=>`<button data-add2="${p.id}"><i style="background:${col(p.cat)}"></i>${esc(p.name)}<small>${esc(p.area)}</small></button>`).join("")||'<div class="empty" style="padding:10px">Не нашлось</div>'};
     ts.onclick=e=>{const b=e.target.closest("[data-add2]");if(b){t.stops.push(+b.dataset.add2);activeTrip=t.id;save();setTimeout(()=>$("#tq")&&$("#tq").focus(),0)}};
     if($("#tOpt"))$("#tOpt").onclick=()=>{optimizeTrip(t);save();toast("Порядок остановок пересчитан по расстоянию")};
     if($("#tMap"))$("#tMap").onclick=()=>{activeTrip=t.id;saveTrips();switchTab("map");computeTrip(t)};
@@ -1921,7 +1950,7 @@ function renderTrips(){const B=$("#tripsBody");
     <div class="tlist">${trips.map(t=>{const ps=t.stops.map(byId).filter(Boolean);return `<button class="trip" data-trip="${t.id}"><span class="tcov">${ps.slice(0,3).map(p=>p.thumb?`<img src="${p.thumb}" alt="">`:`<span class="noimg" style="background:${col(p.cat)}"></span>`).join("")}</span>
       <span><b>${esc(t.name)}</b><small>${ps.length} ${plural(ps.length,"место","места","мест")}${t.id===activeTrip?" · текущая":""}</small><small class="tnames">${ps.map(p=>esc(p.name)).join(" → ")}</small></span></button>`}).join("")||'<div class="empty">Пока нет поездок.</div>'}</div>`;
   $("#tNew").onclick=()=>{tripView=newTrip().id;renderTrips()};
-  B.querySelectorAll("[data-trip]").forEach(b=>b.onclick=()=>{tripView=+b.dataset.trip;activeTrip=tripView;saveTrips();renderTrips()})}
+  B.querySelectorAll("[data-trip]").forEach(b=>b.onclick=()=>{history.pushState({v2:"trip"},"");tripView=+b.dataset.trip;activeTrip=tripView;saveTrips();renderTrips()})}
 // nearest-neighbour + 2-opt on straight-line distances, start fixed
 function optimizeTrip(t){const S=t.start==="me"&&me?me:HOME;const P=t.stops.map(byId).filter(Boolean);if(P.length<3)return;
   const d=(a,b)=>hav(a.lat,a.lng,b.lat,b.lng);let rest=[...P],cur=S,ord=[];while(rest.length){rest.sort((a,b)=>d(cur,a)-d(cur,b));cur=rest.shift();ord.push(cur)}
@@ -1960,10 +1989,10 @@ async function computeTrip(t,o={}){const quiet=!!o.quiet;curTrip=t;curRoute=null
   const wp=pts.slice(1,-1).map(p=>p.lat+","+p.lng).join("|");const last=pts[pts.length-1];
   const gm=`https://www.google.com/maps/dir/?api=1&origin=${pts[0].lat},${pts[0].lng}&destination=${last.lat},${last.lng}${wp?"&waypoints="+encodeURIComponent(wp):""}&travelmode=driving`;if(curRoute)curRoute.gm=gm;
   box.innerHTML=`<div class="big"><strong>${fmtDur(secs)}</strong><span>${(meters/1000).toFixed(1).replace(".",",")} км на байке в дороге</span></div>
+    <div class="row">${curRoute?`<button class="btn pri go" id="tGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button>`:""}<a class="btn" href="${gm}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${curRoute&&offlineOK()?`<button class="btn" id="tOff">Сохранить карту офлайн</button>`:""}</div>
     <div class="steps"><div>Плюс время на сами места. ${bad.length?"":"Порядок можно поменять в разделе «Поездки»."}</div></div>
     ${bad.length?`<div class="warn">По дорогам не доехать до: ${bad.map(esc).join(", ")}. На Нуса-Пениду и Лембонган — фастбот из Санура.</div>`:""}
-    <ol class="tl"><li><span class="tdot"></span><b>${esc(pts[0].name)}</b></li>${legs.map((l,i)=>`<li><small>${l.secs!=null?fmtDur(l.secs)+" · "+fmtKm(l.m/1000):"нет дороги"}</small><span class="tdot n">${i+1}</span><button data-go="${l.to.id}"><b>${esc(l.to.name)}</b></button></li>`).join("")}</ol>
-    <div class="row">${curRoute?`<button class="btn pri go" id="tGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button>`:""}<a class="btn" href="${gm}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${curRoute&&offlineOK()?`<button class="btn" id="tOff">Сохранить карту офлайн</button>`:""}</div>`;
+    <ol class="tl"><li><span class="tdot"></span><b>${esc(pts[0].name)}</b></li>${legs.map((l,i)=>`<li><small>${l.secs!=null?fmtDur(l.secs)+" · "+fmtKm(l.m/1000):"нет дороги"}</small><span class="tdot n">${i+1}</span><button data-go="${l.to.id}"><b>${esc(l.to.name)}</b></button></li>`).join("")}</ol>`;
   if($("#tGo"))$("#tGo").onclick=startNav;if($("#tOff"))$("#tOff").onclick=()=>saveOffline(curRoute.flat)}
 $("#tripClose").onclick=()=>{stopNav();curTrip=null;curRoute=null;routeLayer.clearLayers();showMarkers(true);showView("vList");setSheet("peek")};
 $("#tripEdit").onclick=()=>{if(curTrip){tripView=curTrip.id;switchTab("trips")}};
@@ -1987,7 +2016,7 @@ function renderMe(){const B=$("#meBody");const F=[...favs].map(byId).filter(Bool
   B.innerHTML=`<div class="stats"><div><b>${V.length}</b><small>из ${PLACES.length} мест посещено</small><span class="bar"><i style="width:${pct}%;background:var(--sage)"></i></span></div><div><b>${F.length}</b><small>в избранном</small></div><div><b>${trips.length}</b><small>${plural(trips.length,"поездка","поездки","поездок")}</small></div></div>
    <section class="coll"><div class="chd"><h2>Избранное</h2>${F.length?`<button class="link" id="mFavMap">На карте</button>`:""}</div>${F.length?`<div class="grid">${F.map(p=>pcard(p)).join("")}</div>`:'<div class="empty">Нажмите ★ в карточке места, чтобы сохранить его сюда.</div>'}</section>
    <section class="coll"><div class="chd"><h2>Мои заметки</h2></div>${N.length?N.map(p=>`<button class="noteit" data-go="${p.id}"><b>${esc(p.name)}</b><span>${esc(notes[p.id])}</span></button>`).join(""):'<div class="empty">В карточке места можно оставить себе заметку: «лучше в 7 утра», «взять наличные».</div>'}</section>
-   <section class="coll"><div class="chd"><h2>Где я уже была</h2></div>${V.length?V.map(p=>`<button class="visit" data-go="${p.id}"><span class="vdot" style="background:${col(p.cat)}"></span><b>${esc(p.name)}</b><small>${visitedAt[p.id]?new Date(visitedAt[p.id]).toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"}):""}</small></button>`).join(""):'<div class="empty">Отмечайте «Был(а)» в карточке — здесь появится ваша история.</div>'}</section>`;
+   <section class="coll"><div class="chd"><h2>Где я уже был(а)</h2></div>${V.length?V.map(p=>`<button class="visit" data-go="${p.id}"><span class="vdot" style="background:${col(p.cat)}"></span><b>${esc(p.name)}</b><small>${visitedAt[p.id]?new Date(visitedAt[p.id]).toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"}):""}</small></button>`).join(""):'<div class="empty">Отмечайте «Был(а)» в карточке — здесь появится ваша история.</div>'}</section>`;
   if($("#mFavMap"))$("#mFavMap").onclick=()=>showOnMap("Избранное",F.map(p=>p.id))}
 
 /* ---------- «Ещё» ---------- */
@@ -1999,8 +2028,9 @@ function renderMore(){const custom=!!store.get("bali-home",null),sat=store.get("
 $("#homeMe").onclick=async()=>{toast("Определяю, где вы…");try{await waitFix()}catch(e){toast("Не удалось определить местоположение");return}
   if(!me.bali){toast("Вы сейчас не на Бали");return}const h={name:"Мой дом",addr:"Моё местоположение на момент сохранения",plus:"",lat:+me.lat.toFixed(6),lng:+me.lng.toFixed(6)};
   h.gm=`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}`;store.set("bali-home",h);applyHome(h);renderMore();toast("Дом сохранён на этом устройстве")};
-$("#homePick").onclick=()=>{pickHome=true;document.body.classList.add("picking");switchTab("map");setSheet("peek");toast("Нажмите на карте, где ваш дом")};
-$("#homeReset").onclick=()=>{try{localStorage.removeItem("bali-home")}catch(e){}applyHome(null);renderMore();toast("Вернула дом по умолчанию")};
+$("#homePick").onclick=()=>{switchTab("map");pickHome=true;document.body.classList.add("picking");$("#pickBan").hidden=false;setSheet("peek")};
+$("#pickCancel").onclick=endPick;
+$("#homeReset").onclick=()=>{try{localStorage.removeItem("bali-home")}catch(e){}applyHome(null);renderMore();toast("Дом по умолчанию возвращён")};
 $("#setSat").onclick=()=>{setLayer(true);renderMore()};$("#setMap").onclick=()=>{setLayer(false);renderMore()};
 $("#setVoice").onclick=()=>{const v=!store.get("bali-voice",true);store.set("bali-voice",v);if(nav)nav.voice=v;renderMore()};
 $("#offClear").onclick=async()=>{try{await caches.delete("bali-offline");await caches.delete("bali-tiles")}catch(e){}renderMore();toast("Сохранённые карты удалены")};
@@ -2014,7 +2044,18 @@ function handleHash(){if(!location.hash)return;let h="";try{h=decodeURIComponent
 addEventListener("hashchange",handleHash);
 
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(tab!=="map")switchTab("map");else if(!$("#vCard").hidden){deselect();showView("vList")}}});
-render();renderNear();updateTripBadge();handleHash();
+// phone Back: close pages / drill-ins / card / route instead of leaving the app
+addEventListener("popstate",()=>{if(nav)return;
+  if(tab==="places"&&pstate.view){pstate.view=null;renderPlaces();return}
+  if(tab==="trips"&&tripView){tripView=null;renderTrips();return}
+  if(tab!=="map"){switchTab("map",true);return}
+  if(!$("#vCard").hidden){$("#cBack").click();return}
+  if(!$("#vRoute").hidden){$("#routeClose").click();return}
+  if(!$("#vTrip").hidden){$("#tripClose").click();return}});
+if(!store.get("bali-home",null)&&!store.get("bali-hello",false))setTimeout(()=>{$("#hello").hidden=false},1200);
+$("#helloSet").onclick=()=>{store.set("bali-hello",true);$("#hello").hidden=true;switchTab("more")};
+$("#helloNo").onclick=()=>{store.set("bali-hello",true);$("#hello").hidden=true};
+window.__v2=1;render();updateTripBadge();handleHash();
 window.balimap=map; // handy for debugging in the console
 document.addEventListener("error",e=>{const im=e.target;if(im.tagName!=="IMG"||!im.dataset.cat)return;const s=document.createElement(im.dataset.big?"div":"span");
   s.className="noimg";s.style.background=col(im.dataset.cat);s.innerHTML=svg(im.dataset.cat,im.dataset.big?56:26);im.replaceWith(s)},true);
