@@ -1,5 +1,5 @@
 // Offline support. Bump VERSION whenever index.html, vendor files or data change.
-const VERSION = "bali-2026-11-16-lock";
+const VERSION = "bali-2026-11-16-v2";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "vendor/leaflet.js", "vendor/leaflet.markercluster.js",
   "data/places.enc.json", "icons/icon-192.png", "icons/icon-512.png"];
 const TILES = "bali-tiles";   // map tiles you have viewed, kept across versions
@@ -12,13 +12,13 @@ self.addEventListener("install", e => {
 
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k !== VERSION && k !== TILES && k !== MEDIA).map(k => caches.delete(k))))
+    .then(keys => Promise.all(keys.filter(k => k !== VERSION && k !== TILES && k !== MEDIA && k !== "bali-offline").map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
 async function cacheFirst(req, name, trim) {
   const cache = await caches.open(name);
-  const hit = await cache.match(req);
+  const hit = await cache.match(req) || (name === TILES ? await (await caches.open("bali-offline")).match(req.url) : null);
   if (hit) return hit;
   const res = await fetch(req);
   if (res.ok) {
@@ -57,6 +57,7 @@ self.addEventListener("fetch", e => {
   const url = new URL(req.url);
   if (url.hostname.endsWith("arcgisonline.com")) return e.respondWith(cacheFirst(req, TILES, true));
   if (url.hostname.endsWith("gstatic.com") || url.hostname.endsWith("googleapis.com")) return e.respondWith(cacheFirst(req, MEDIA));
+  if (url.hostname.endsWith(".wikimedia.org")) return e.respondWith(cacheFirst(req, MEDIA));
   if (url.origin !== location.origin) return;
   if (url.pathname.includes("/photos/") || url.pathname.endsWith("/data/roads.json")) return e.respondWith(cacheFirst(req, MEDIA));
   e.respondWith(networkFirst(req));

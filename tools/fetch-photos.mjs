@@ -1,6 +1,6 @@
 // Downloads place photos from Google (lh3.googleusercontent.com) into app/photos/.
 // Usage: node tools/fetch-photos.mjs   (skips photos that already exist; --force re-downloads)
-// Large: <id>.jpg (1000x700), thumbnail: <id>_t.jpg (200x200). Needs Node 18+.
+// Large: <id>.jpg (1600x1067, cropped 3:2), thumbnail: <id>_t.jpg (400x400). Needs Node 18+.
 import { readFile, writeFile, access } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -12,8 +12,8 @@ const exists = p => access(p).then(() => true, () => false);
 
 const jobs = [];
 for (const [id, base] of Object.entries(sources)) {
-  jobs.push([base + "=w1000-h700-k-no", path.join(root, "app/photos", `${id}.jpg`)]);
-  jobs.push([base + "=w200-h200-k-no", path.join(root, "app/photos", `${id}_t.jpg`)]);
+  jobs.push([base + "=w1600-h1067-p-k-no", path.join(root, "app/photos", `${id}.jpg`)]);
+  jobs.push([base + "=w400-h400-p-k-no", path.join(root, "app/photos", `${id}_t.jpg`)]);
 }
 
 let ok = 0, skipped = 0;

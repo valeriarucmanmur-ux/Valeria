@@ -25,6 +25,8 @@ jobs:
       - run: npm ci
       - name: Скачать фото мест
         run: npm run photos || echo "Часть фото не скачалась — в приложении будет значок категории"
+      - name: Сжать фото
+        run: pip install -q pillow && python3 tools/optimize-photos.py
       - run: npm run check
       - run: npx cap sync android
       - name: Собрать APK
@@ -60,6 +62,8 @@ jobs:
       - run: npm ci
       - name: Скачать фото мест
         run: npm run photos || echo "Часть фото не скачалась — в приложении будет значок категории"
+      - name: Сжать фото
+        run: pip install -q pillow && python3 tools/optimize-photos.py
       - run: npx cap sync ios
       - name: Собрать архив без подписи
         run: |

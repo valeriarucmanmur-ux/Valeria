@@ -997,6 +997,173 @@ body.nav .leaflet-bottom{bottom:calc(84px + env(safe-area-inset-bottom,0px));opa
 .lockerr{min-height:20px;color:#c4352a;font-weight:700;font-size:14px}
 .shake{animation:shk .35s}
 @keyframes shk{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+[hidden]{display:none!important}
+/* ===== v2: tab bar, pages, catalog, trips, gallery ===== */
+.tabbar{position:absolute;z-index:1000;left:50%;transform:translateX(calc(-50% + 212px));bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:2px;background:var(--paper);border-radius:999px;box-shadow:var(--shadow-lg);padding:5px}
+.tabbar button{position:relative;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:68px;padding:6px 10px;border-radius:999px;color:var(--muted);font-size:11.5px;font-weight:700}
+.tabbar svg{width:22px;height:22px}
+.tabbar button[aria-current]{color:var(--accent);background:var(--accent-soft)}
+.tbadge{position:absolute;top:2px;right:14px;min-width:17px;height:17px;border-radius:9px;background:var(--accent);color:#fff;font-size:10.5px;font-style:normal;font-weight:800;display:grid;place-items:center;padding:0 4px}
+.tbadge[hidden]{display:none}
+body.nav .tabbar,body.picking .tabbar{display:none}
+body.picking #map{cursor:crosshair}
+.page{position:absolute;z-index:950;left:max(12px,env(safe-area-inset-left,0px));top:calc(12px + env(safe-area-inset-top,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:min(780px,calc(100vw - 24px));background:var(--paper);border-radius:var(--r);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;overflow:hidden}
+.page[hidden]{display:none}
+body.onpage .top,body.onpage .sheet,body.onpage .ctrls{visibility:hidden}
+.phead{padding:16px 18px 10px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--line)}
+.phead h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em}
+.psearch{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:14px;height:46px;padding:0 14px}
+.psearch svg{width:19px;height:19px;color:var(--muted);flex:none}
+.psearch input{flex:1;min-width:0;border:0;background:none;outline:none;font-size:16px;height:100%}
+.pchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:0 18px 2px}
+.pchips::-webkit-scrollbar{display:none}
+.pchips .pill{flex:none;height:36px;font-size:13px}
+.pbody{flex:1;overflow-y:auto;padding:6px 18px 30px;-webkit-overflow-scrolling:touch}
+.coll{margin-top:18px}
+.chd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.chd h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.01em}
+.hscroll{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:0 18px 4px;scroll-snap-type:x proximity}
+.hscroll::-webkit-scrollbar{display:none}
+.hscroll .pc{flex:none;width:168px;scroll-snap-align:start}
+.pc{position:relative;display:flex;flex-direction:column;gap:7px;border:0;background:none;padding:0;text-align:left;color:var(--ink);min-width:0}
+.pc img,.pc .noimg{width:100%;aspect-ratio:4/3;height:auto;border-radius:14px;object-fit:cover;background:var(--soft2);display:block}
+.pc .noimg{display:grid}
+.pct{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pct b{font-size:14px;line-height:1.25;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pcs{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcs i{width:8px;height:8px;border-radius:50%;flex:none}
+.pcs em{font-style:normal;color:#b98300;font-weight:700}
+.pcs .ok{color:#1b8a4a;font-weight:700}.pcs .no{color:#b0432f;font-weight:600}
+.pfav,.pvis{position:absolute;top:8px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:14px;background:rgba(255,253,249,.94);box-shadow:var(--shadow)}
+.pfav{right:8px;color:#e0a100}.pvis{left:8px;color:var(--sage);font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px 14px}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.catb{border:1px solid var(--line);background:var(--paper);border-radius:16px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:var(--ink)}
+.catb i{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.catb small{color:var(--faint);font-weight:600}
+.regs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.reg{position:relative;height:120px;border:0;border-radius:16px;overflow:hidden;padding:0;background:var(--soft2);text-align:left;color:#fff}
+.reg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.reg span{position:absolute;inset:auto 0 0 0;padding:28px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.7));display:flex;flex-direction:column}
+.reg b{font-size:14.5px;line-height:1.2}.reg small{font-size:11.5px;opacity:.9}
+.dhead{display:flex;align-items:center;gap:10px;margin:8px 0 12px}
+.dhead>div{flex:1;min-width:0}
+.dhead h2{margin:0;font-size:20px;font-weight:800;line-height:1.2}
+.dhead small{color:var(--muted)}
+.ddesc{color:var(--muted);font-size:13.5px;margin:8px 0 12px}
+.sbtn{width:38px;height:38px;flex:none;border-radius:50%;border:0;background:var(--soft);display:grid;place-items:center;color:var(--ink)}
+.sbtn:disabled{opacity:.3}
+.btn.danger{color:#c4352a}
+.btn.wide{width:100%}
+/* near carousel in the map sheet */
+.nearw{display:flex;flex-direction:column;gap:6px;margin:0 -16px}
+.nearw>small{padding:0 16px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.near,.hscroll.small{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 16px 2px;touch-action:pan-x}
+.near::-webkit-scrollbar{display:none}
+.nc{flex:none;width:200px;display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:6px;text-align:left;color:var(--ink)}
+.nc img,.nc .noimg{width:48px;height:48px;border-radius:10px;object-fit:cover;flex:none}
+.nc span{display:flex;flex-direction:column;min-width:0}
+.nc b{font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hscroll.small{margin:0 -18px;padding:0 18px 2px}
+/* card gallery */
+.gal{display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;touch-action:pan-x}
+.gal::-webkit-scrollbar{display:none}
+.gal img{flex:none;width:100%;height:100%;object-fit:cover;scroll-snap-align:center}
+.gdots{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;gap:5px}
+.gdots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 0 3px rgba(0,0,0,.4)}
+.gdots i.on{background:#fff;width:18px;border-radius:4px}
+.credit{max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ostat{font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 10px}
+.ostat.ok{background:#e3f4e9;color:#1b7a42}.ostat.no{background:#fbe9e5;color:#a63b28}
+.ptag{font-size:12px;font-weight:600;color:var(--muted);background:var(--soft);border-radius:999px;padding:5px 10px}
+#cNote{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;background:var(--bg);resize:vertical}
+/* trips */
+.tlist{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.trip{display:flex;gap:12px;align-items:center;border:1px solid var(--line);background:var(--paper);border-radius:16px;padding:10px;text-align:left;color:var(--ink)}
+.tcov{display:flex;flex:none}
+.tcov img,.tcov .noimg{width:46px;height:46px;border-radius:12px;object-fit:cover;border:2px solid var(--paper);margin-left:-14px}
+.tcov>:first-child{margin-left:0}
+.trip>span:last-child{display:flex;flex-direction:column;min-width:0}
+.trip b{font-size:15px}.trip small{color:var(--muted);font-size:12.5px}
+.tnames{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tname{flex:1;min-width:0;border:0;border-bottom:1.5px solid var(--line);background:none;font:inherit;font-size:20px;font-weight:800;padding:4px 0}
+.tstart{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.stops{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.stops li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:7px}
+.stops img,.stops .noimg{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:none}
+.sn{width:24px;height:24px;border-radius:50%;background:var(--route);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center;flex:none}
+.sname{flex:1;min-width:0;border:0;background:none;text-align:left;padding:0;color:var(--ink);display:flex;flex-direction:column}
+.sname b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sname small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sact{display:flex;gap:4px}.sact .sbtn{width:32px;height:32px;font-size:14px}
+.tadd{position:relative;margin-top:12px}
+.tadd input{width:100%;height:46px;border-radius:14px;border:1px dashed #cfc5b6;background:var(--bg);padding:0 14px;font-size:16px}
+.tsugg{display:flex;flex-direction:column}
+.tsugg button{display:flex;align-items:center;gap:8px;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 4px;text-align:left;color:var(--ink)}
+.tsugg i{width:9px;height:9px;border-radius:50%;flex:none}.tsugg small{margin-left:auto;color:var(--faint);font-size:11.5px;white-space:nowrap}
+.tfav{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px}.tfav small{color:var(--muted);margin-right:4px}
+.tsum{color:var(--muted);font-size:13px}
+.tbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.snum{width:26px;height:26px;border-radius:50%;background:var(--route);color:#fff;border:2.5px solid #fff;box-shadow:var(--shadow);font-weight:800;font-size:12.5px;display:grid;place-items:center}
+.tl{list-style:none;margin:0;padding:0 0 0 4px;display:flex;flex-direction:column}
+.tl li{position:relative;display:flex;align-items:center;gap:10px;padding:8px 0 8px 30px;border-left:2px dotted #b9c9ea;margin-left:11px}
+.tl li:last-child{border-left-color:transparent}
+.tl .tdot{position:absolute;left:-12px;width:22px;height:22px;border-radius:50%;background:var(--paper);border:3px solid var(--route)}
+.tl .tdot.n{background:var(--route);color:#fff;border-color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 1px var(--route)}
+.tl small{position:absolute;left:30px;top:-10px;font-size:11.5px;color:var(--muted)}
+.tl li{margin-top:12px}
+.tl button{border:0;background:none;padding:0;text-align:left;color:var(--ink)}
+/* my places */
+.stats{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-top:12px}
+.stats>div{background:var(--soft);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.stats b{font-size:24px;font-weight:800}.stats small{color:var(--muted);font-size:12px}
+.stats .bar{margin-top:6px;height:6px}
+.noteit,.visit{width:100%;display:flex;gap:10px;align-items:baseline;border:0;border-bottom:1px solid var(--line);background:none;padding:11px 2px;text-align:left;color:var(--ink)}
+.noteit{flex-direction:column;gap:2px}.noteit span{color:var(--muted);font-size:13px}
+.visit .vdot{width:10px;height:10px;border-radius:50%;flex:none}.visit small{margin-left:auto;color:var(--faint);white-space:nowrap}
+/* settings */
+.set{border-top:1px solid var(--line);padding:16px 0}
+.set:first-child{border-top:0}
+.set h2{margin:0 0 10px;font-size:16px;font-weight:800}
+.hint{color:var(--muted);font-size:13px;margin:8px 0 10px}
+.sethome{display:flex;gap:12px;align-items:center}
+.hic{width:44px;height:44px;border-radius:50%;background:#23201c;color:#fff;display:grid;place-items:center;flex:none}
+#homeInfo{display:flex;flex-direction:column}#homeInfo small{color:var(--muted)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:999px;padding:8px 18px;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;font-size:14px}
+.tog button{width:50px;height:30px;border-radius:15px;border:0;background:#d8d0c3;position:relative;flex:none}
+.tog button:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.tog button[aria-pressed="true"]{background:#1b8a4a}.tog button[aria-pressed="true"]:after{left:23px}
+#costs{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;font-size:13px}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:none}
+.leaflet-control-attribution{font-size:10px!important}
+.flt>select{height:36px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 10px;width:100%;font-size:13px}
+@media (max-width:760px){
+  .tabbar{left:0;right:0;bottom:0;transform:none;border-radius:0;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));justify-content:space-around;box-shadow:0 -1px 0 var(--line),0 -6px 18px rgba(54,40,24,.08)}
+  .tabbar button{min-width:0;flex:1;padding:6px 2px}
+  .sheet{bottom:calc(56px + env(safe-area-inset-bottom,0px));padding-bottom:0}
+  .page{left:0;right:0;top:0;width:100%;border-radius:0;bottom:calc(56px + env(safe-area-inset-bottom,0px));box-shadow:none;padding-top:env(safe-area-inset-top,0px)}
+  .phead{padding:12px 16px 10px}.phead h1{font-size:24px}
+  .pbody{padding:4px 16px 30px}
+  .hscroll,.pchips{margin:0 -16px;padding-left:16px;padding-right:16px}
+  .hscroll .pc{width:150px}
+  .grid{grid-template-columns:1fr 1fr;gap:16px 12px}
+  .cats{grid-template-columns:repeat(3,1fr)}
+  .regs{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}.stats>div:first-child{grid-column:1/-1}
+  .leaflet-control-attribution{max-width:calc(100vw - 70px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px!important;line-height:1.5}
+  .leaflet-control-attribution.open{white-space:normal}
+  .flt>select{font-size:16px}
+  .toast{bottom:calc(var(--sh,124px) + 16px)}
+  body.onpage .toast{bottom:auto;top:calc(12px + env(safe-area-inset-top,0px))}
+  .hero{aspect-ratio:2/1}
+  body.nav .tabbar{display:none}
+  body[data-sm="half"] #homeBtn,body[data-sm="half"] #fitBtn{display:none}
+}
 </style>
 </head>
 <body>
@@ -1029,11 +1196,12 @@ body.nav .leaflet-bottom{bottom:calc(84px + env(safe-area-inset-bottom,0px));opa
     <div class="vhead">
       <div class="vtitle">
         <div><h1>Бали без толп</h1><p><span id="total"></span> мест · Instagram, Telegram, Google Maps и открытые источники</p></div>
-        <span class="row" style="flex-wrap:nowrap"><button class="pill fbtn" id="fltBtn" aria-expanded="false">Фильтры</button><button class="pill" id="infoBtn">Важно</button></span>
+        <span class="row" style="flex-wrap:nowrap"><button class="pill fbtn" id="fltBtn" aria-expanded="false">Фильтры</button></span>
       </div>
+      <div class="nearw"><small id="nearT">Рядом</small><div class="near" id="near"></div></div>
       <div class="flt">
+      <select id="region" aria-label="Район"><option value="">Все районы</option></select>
       <div class="row">
-        <select id="region" aria-label="Район"><option value="">Все районы</option></select>
         <select id="price" aria-label="Стоимость">
           <option value="">Любая цена</option>
           <option value="0">Бесплатно</option>
@@ -1050,10 +1218,7 @@ body.nav .leaflet-bottom{bottom:calc(84px + env(safe-area-inset-bottom,0px));opa
         </select>
       </div>
       <div class="row" id="srcs">
-        <button class="pill" data-src="IG" aria-pressed="false">Instagram</button>
-        <button class="pill" data-src="TG" aria-pressed="false">Telegram</button>
-        <button class="pill" data-src="GM" aria-pressed="false">Google Maps</button>
-        <button class="pill" data-src="Web" aria-pressed="false">Источники</button>
+        <button class="pill" id="openNow" aria-pressed="false">Открыто сейчас</button>
         <button class="pill" id="visitedHide" aria-pressed="false">Скрыть посещённые</button>
       </div>
       </div>
@@ -1062,6 +1227,10 @@ body.nav .leaflet-bottom{bottom:calc(84px + env(safe-area-inset-bottom,0px));opa
     <div class="list" id="list"></div>
   </div>
   <div class="view" id="vCard" hidden><div class="card" id="card"></div></div>
+  <div class="view" id="vTrip" hidden>
+    <div class="vhead"><div class="vtitle"><h1 id="tTitle">Поездка</h1><span class="row" style="flex-wrap:nowrap"><button class="pill" id="tripEdit">Изменить</button><button class="sbtn" id="tripClose" aria-label="Закрыть поездку"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.4" fill="none"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span></div></div>
+    <div class="rres" id="tres"></div>
+  </div>
   <div class="view" id="vRoute" hidden>
     <div class="vhead">
       <div class="vtitle"><h1>Маршрут</h1><button class="sbtn" id="routeClose" aria-label="Закрыть маршрут"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.4" fill="none"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
@@ -1088,16 +1257,36 @@ body.nav .leaflet-bottom{bottom:calc(84px + env(safe-area-inset-bottom,0px));opa
 <div class="navban" id="navBan" hidden><div class="nb-ic" id="nbIc"></div><div class="nb-tx"><b id="nbDist"></b><span id="nbText"></span><small id="nbThen"></small></div>
   <button class="nb-snd" id="nbSnd" aria-label="Голосовые подсказки"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="w" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path class="x" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button></div>
 <div class="navbar" id="navBar" hidden><div class="nv-l"><b id="nvTime"></b><span id="nvInfo"></span></div><button class="btn" id="nvGm" aria-label="Открыть в Google Maps">Google Maps</button><button class="btn stop" id="nvStop">Завершить</button></div>
-<div class="modal" id="info" hidden>
-  <div class="box" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
-    <h2 id="infoTitle">Что важно знать</h2>
-    <ul id="costs"></ul>
-    <h2 style="font-size:15px;margin-top:16px">Цвета меток</h2>
-    <div class="legend" id="legend"></div>
-    <p>Цены собраны из открытых источников 2025–2026 годов и могут меняться. Время в пути — оценка для байка по дорогам OpenStreetMap без учёта пробок; для навигации в дороге откройте маршрут в Google Maps. Подложка — топографическая карта Esri с рельефом. Фото — из карточек мест в Google Maps. Избранное и отметки «был(а)» хранятся в этом браузере.</p>
-    <div class="row"><button class="btn pri" id="infoClose">Понятно</button><button class="btn" id="lockNow">Выйти и заблокировать</button></div>
-  </div>
-</div>
+<nav class="tabbar" id="tabbar" aria-label="Разделы">
+  <button data-tab="map" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Карта</span></button>
+  <button data-tab="places"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>Места</span></button>
+  <button data-tab="trips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H16a3.5 3.5 0 0 0 0-7H8a3.5 3.5 0 0 1 0-7h7.5"/></svg><span>Поездки</span><i class="tbadge" id="tripBadge" hidden></i></button>
+  <button data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 17.3 6.2 21l1.6-6.7L2.6 9.8l6.9-.6L12 3l2.5 6.2 6.9.6-5.2 4.5 1.6 6.7z"/></svg><span>Моё</span></button>
+  <button data-tab="more"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><span>Ещё</span></button>
+</nav>
+<section class="page" id="pgPlaces" hidden aria-label="Места">
+  <div class="phead"><h1>Места</h1>
+    <div class="psearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="pq" type="search" placeholder="Найти место, район, «закат»…" autocomplete="off" aria-label="Поиск мест"></div>
+    <div class="pchips" id="pChips"></div></div>
+  <div class="pbody" id="placesBody"></div>
+</section>
+<section class="page" id="pgTrips" hidden aria-label="Поездки"><div class="phead"><h1>Поездки</h1></div><div class="pbody" id="tripsBody"></div></section>
+<section class="page" id="pgMe" hidden aria-label="Моё"><div class="phead"><h1>Моё</h1></div><div class="pbody" id="meBody"></div></section>
+<section class="page" id="pgMore" hidden aria-label="Ещё"><div class="phead"><h1>Ещё</h1></div><div class="pbody">
+  <section class="set"><h2>Мой дом</h2><div class="sethome"><span class="hic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11 12 3.5 21 11M5.5 9v11h13V9"/></svg></span><span id="homeInfo"></span></div>
+    <p class="hint">От дома считаются «км от дома» и маршруты. Если вы живёте в другом месте, сохраните свой дом — он хранится только на этом телефоне.</p>
+    <div class="row"><button class="btn" id="homeMe">Мой дом — где я сейчас</button><button class="btn" id="homePick">Выбрать на карте</button><button class="btn" id="homeReset" hidden>Вернуть по умолчанию</button></div></section>
+  <section class="set"><h2>Карта и навигатор</h2>
+    <div class="seg"><button id="setMap" aria-pressed="true">Схема</button><button id="setSat" aria-pressed="false">Спутник</button></div>
+    <label class="tog"><span>Голосовые подсказки в навигаторе</span><button id="setVoice" aria-pressed="true" aria-label="Голосовые подсказки"></button></label></section>
+  <section class="set" id="offRow"><h2>Без интернета</h2><p class="hint">Карта кэшируется сама, пока вы её смотрите. Для поездки в горы откройте маршрут и нажмите «Сохранить карту офлайн» — фрагменты вдоль пути сохранятся на телефоне. Места, фото и дороги для навигатора работают без сети.</p>
+    <div class="row"><small id="offSize"></small><button class="btn" id="offClear">Удалить сохранённые карты</button></div></section>
+  <section class="set"><h2>Что важно знать</h2><ul id="costs"></ul></section>
+  <section class="set"><h2>Цвета меток</h2><div class="legend" id="legend"></div></section>
+  <section class="set"><h2>Как установить на телефон</h2><p class="hint"><b>iPhone:</b> откройте ссылку в Safari → «Поделиться» → «На экран Домой».<br><b>Android:</b> откройте в Chrome → меню ⋮ → «Установить приложение».<br>Пароль вводится один раз на каждом устройстве.</p></section>
+  <section class="set"><h2>О данных</h2><p class="hint">Цены — из открытых источников 2025–2026 годов, могут меняться. Время в пути — оценка для байка по дорогам OpenStreetMap без пробок; навигатор в приложении ведёт по тем же дорогам, Google Maps открывается из карточки и маршрута. Подложка карты © Esri. Фото — Google Maps и Wikimedia Commons (авторы указаны на фото). Избранное, заметки и поездки хранятся только на этом устройстве.</p></section>
+  <section class="set"><button class="btn danger wide" id="lockNow">Выйти и заблокировать</button></section>
+</div></section>
 
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/leaflet.markercluster.js"></script>
@@ -1147,7 +1336,7 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&g
 const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let favs=new Set(store.get("bali-favs",[])), visited=new Set(store.get("bali-visited",[]));
 const ALLC=Object.keys(CATS).filter(c=>PLACES.some(p=>p.cat===c));
-const state={q:"",cats:new Set(),region:"",price:"",sort:"region",srcs:new Set(),favOnly:false,hideVisited:false,sel:null};
+const state={q:"",cats:new Set(),region:"",price:"",sort:"region",srcs:new Set(),favOnly:false,hideVisited:false,openNow:false,ids:null,idsName:"",sel:null};
 const R=6371000,rad=Math.PI/180;
 const hav=(a,b,c,d)=>{const dl=(c-a)*rad,dn=(d-b)*rad,x=Math.sin(dl/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
 PLACES.forEach(p=>p.homeKm=hav(HOME.lat,HOME.lng,p.lat,p.lng)/1000);
@@ -1157,6 +1346,7 @@ const BOUNDS=L.latLngBounds([-8.95,114.3],[-7.95,115.82]);
 const map=L.map("map",{zoomControl:false,attributionControl:true,minZoom:innerWidth<=760?8.5:9,maxZoom:18,maxBounds:L.latLngBounds([-9.7,113.9],[-7.3,116.2]),maxBoundsViscosity:.8,zoomSnap:.25,zoomDelta:.5,wheelPxPerZoomLevel:90,tap:true});
 map.attributionControl.setPrefix(false).addAttribution('Карта © <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a>, HERE, Garmin, FAO, USGS · дороги для маршрутов © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>');
 L.control.scale({imperial:false,position:"bottomright"}).addTo(map);
+map.attributionControl.getContainer().addEventListener("click",e=>{if(e.target.tagName!=="A")e.currentTarget.classList.toggle("open")});
 // Esri World Topographic Map: relief, coastline, roads, street names. crossOrigin lets the service worker cache tiles for offline use.
 L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
   {maxZoom:19,maxNativeZoom:17,minZoom:8,crossOrigin:true,keepBuffer:2,bounds:BOUNDS.pad(.3)}).addTo(map);
@@ -1164,10 +1354,11 @@ const isPhone=()=>innerWidth<=760;
 const sheet=$("#sheet");
 // Phone sheet snap heights: peek shows the header, half splits screen with the map, full stops under the search bar.
 const topBottom=()=>Math.round($(".top").getBoundingClientRect().bottom+8);
-const snapH=m=>m==="peek"?124:m==="half"?Math.round(innerHeight*.5):innerHeight-topBottom();
+const TABH=()=>isPhone()&&!document.body.classList.contains("nav")?($("#tabbar").offsetHeight||0):0;
+const snapH=m=>m==="peek"?($("#vList").hidden?124:200):m==="half"?Math.round(innerHeight*.5):innerHeight-topBottom()-TABH();
 let sMode="peek";
-function applyH(h,anim){sheet.style.transition=anim?"":"none";sheet.style.height=h+"px";document.body.style.setProperty("--sh",h+"px");document.body.classList.toggle("sfull",h>innerHeight*.62)}
-function setSheet(m){if(!isPhone())return;sMode=m;sheet.dataset.mode=m;applyH(snapH(m),true);if(m!=="full")document.querySelectorAll(".list,.card,.rres").forEach(x=>{if(m==="peek")x.scrollTop=0})}
+function applyH(h,anim){sheet.style.transition=anim?"":"none";sheet.style.height=h+"px";document.body.style.setProperty("--sh",(h+TABH())+"px");document.body.classList.toggle("sfull",h>innerHeight*.62)}
+function setSheet(m){if(!isPhone())return;sMode=m;sheet.dataset.mode=m;document.body.dataset.sm=m;applyH(snapH(m),true);if(m!=="full")document.querySelectorAll(".list,.card,.rres").forEach(x=>{if(m==="peek")x.scrollTop=0})}
 const padFor=m=>isPhone()?{paddingTopLeft:[24,topBottom()+44],paddingBottomRight:[24,snapH(m)+24]}:{paddingTopLeft:[440,90],paddingBottomRight:[80,40]};
 // Keep the point visible beside the sheet: shift the map centre left (desktop) or up into the free area (phone).
 function flyCenter(ll,z,m){let off;if(isPhone()){const top=topBottom(),bot=innerHeight-snapH(m||"half");off=L.point(0,(top+bot)/2-innerHeight/2)}else off=L.point(212,0);
@@ -1198,21 +1389,19 @@ const regions=[...new Set(PLACES.map(p=>p.region))];
 $("#region").insertAdjacentHTML("beforeend",regions.map(r=>`<option>${esc(r)}</option>`).join(""));
 $("#costs").innerHTML=COSTS.map(c=>`<li>${esc(c)}</li>`).join("");
 $("#total").textContent=PLACES.length;
-$("#cats").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.all)state.cats.clear();else{const c=b.dataset.cat;state.cats.has(c)?state.cats.delete(c):state.cats.add(c)}render();showList()});
+$("#cats").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.ids=null;if(b.dataset.all)state.cats.clear();else{const c=b.dataset.cat;state.cats.has(c)?state.cats.delete(c):state.cats.add(c)}render();showList()});
 $("#srcs").addEventListener("click",e=>{const b=e.target.closest("[data-src]");if(!b)return;const s=b.dataset.src;state.srcs.has(s)?state.srcs.delete(s):state.srcs.add(s);render()});
 $("#visitedHide").onclick=()=>{state.hideVisited=!state.hideVisited;render()};
 $("#favOnly").onclick=()=>{state.favOnly=!state.favOnly;render();showList()};
-$("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();render();showList()});
+$("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();state.ids=null;render();showList()});
 $("#q").addEventListener("focus",()=>{if(isPhone()&&$("#vRoute").hidden){showList();setSheet("full")}});
 $("#q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.target.blur();if(isPhone())setSheet("half")}});
 $("#region").onchange=e=>{state.region=e.target.value;render(true)};
 $("#price").onchange=e=>{state.price=e.target.value;render()};
 $("#sort").onchange=e=>{state.sort=e.target.value;render()};
-$("#reset").onclick=()=>{Object.assign(state,{q:"",cats:new Set(),region:"",price:"",srcs:new Set(),favOnly:false,hideVisited:false,sort:"region"});$("#q").value="";$("#region").value="";$("#price").value="";$("#sort").value="region";render();fitIsland()};
-$("#infoBtn").onclick=()=>{$("#info").hidden=false;$("#infoClose").focus()};
-$("#infoClose").onclick=()=>$("#info").hidden=true;
+$("#reset").onclick=()=>{Object.assign(state,{q:"",cats:new Set(),region:"",price:"",srcs:new Set(),favOnly:false,hideVisited:false,openNow:false,ids:null,idsName:"",sort:"region"});$("#q").value="";$("#region").value="";$("#price").value="";$("#sort").value="region";render();fitIsland()};
+$("#openNow").onclick=()=>{state.openNow=!state.openNow;render()};
 $("#lockNow").onclick=()=>{try{localStorage.removeItem("bali-key")}catch(e){}location.reload()};
-$("#info").onclick=e=>{if(e.target.id==="info")$("#info").hidden=true};
 $("#grab").onclick=()=>setSheet(sMode==="half"?"full":"half");
 $("#fltBtn").onclick=e=>{const h=e.currentTarget.closest(".vhead");h.classList.toggle("open");e.currentTarget.setAttribute("aria-expanded",h.classList.contains("open"));if(h.classList.contains("open")&&sMode!=="full")setSheet("full")};
 // tap on a header of a collapsed sheet opens it halfway
@@ -1220,7 +1409,7 @@ sheet.addEventListener("click",e=>{if(isPhone()&&sMode==="peek"&&e.target.closes
 // drag the sheet: from the header anywhere; from the content when the sheet is not full,
 // or when the content is scrolled to the top and the finger pulls down (like Google Maps)
 (()=>{let st=null;const order=["peek","half","full"];
- sheet.addEventListener("touchstart",e=>{if(!isPhone()||e.touches.length>1){st=null;return}const t=e.target;if(t.closest("input,select,textarea,.sugg")){st=null;return}
+ sheet.addEventListener("touchstart",e=>{if(!isPhone()||e.touches.length>1){st=null;return}const t=e.target;if(t.closest("input,select,textarea,.sugg,.near,.gal")){st=null;return}
    const y=e.touches[0].clientY;st={y,h:sheet.getBoundingClientRect().height,sc:t.closest(".list,.card,.rres"),drag:null,ly:y,lt:performance.now(),v:0}},{passive:true});
  sheet.addEventListener("touchmove",e=>{if(!st)return;const y=e.touches[0].clientY,dy=y-st.y;
    if(st.drag===null){if(Math.abs(dy)<6)return;st.drag=!st.sc||sMode!=="full"||(st.sc.scrollTop<=0&&dy>0)}
@@ -1237,6 +1426,8 @@ function visible(){return PLACES.filter(p=>{
   if(state.region&&p.region!==state.region)return false;
   if(state.price!==""&&String(p.level)!==state.price)return false;
   if(state.srcs.size&&![...state.srcs].some(s=>p.src.includes(s)))return false;
+  if(state.ids&&!state.ids.has(p.id))return false;
+  if(state.openNow&&!openInfo(p)?.open)return false;
   if(state.favOnly&&!favs.has(p.id))return false;
   if(state.hideVisited&&visited.has(p.id))return false;
   if(state.q&&!(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat).toLowerCase().includes(state.q))return false;
@@ -1249,7 +1440,7 @@ function render(fit){
   document.querySelectorAll("#srcs [data-src]").forEach(b=>b.setAttribute("aria-pressed",state.srcs.has(b.dataset.src)));
   $("#visitedHide").setAttribute("aria-pressed",state.hideVisited);$("#favOnly").setAttribute("aria-pressed",state.favOnly);
   let v=visible();
-  $("#count").textContent=`Показано ${v.length} из ${PLACES.length}`;
+  $("#count").textContent=state.ids?`«${state.idsName}» · ${v.length}`:`Показано ${v.length} из ${PLACES.length}`;$("#openNow").setAttribute("aria-pressed",state.openNow);
   cluster.clearLayers();cluster.addLayers(v.map(p=>markers[p.id]));
   let html="";
   if(state.sort==="region"){let cur="";v.forEach(p=>{if(p.region!==cur){cur=p.region;html+=`<div class="group">${esc(cur)}</div>`}html+=itemHTML(p)})}
@@ -1260,7 +1451,7 @@ function render(fit){
 $("#list").addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(b)openPlace(+b.dataset.id,true)});
 
 /* ---------------- views ---------------- */
-function showView(id){["vList","vCard","vRoute"].forEach(v=>$("#"+v).hidden=v!==id);sheet.classList.remove("hide")}
+function showView(id){["vList","vCard","vRoute","vTrip"].forEach(v=>$("#"+v).hidden=v!==id);sheet.classList.remove("hide")}
 function showList(){if(!$("#vRoute").hidden)return;deselect();showView("vList")}
 function deselect(){const prev=state.sel;state.sel=null;if(prev!==null&&prev!=="home"&&markers[prev])markers[prev].setIcon(pinIcon(PLACES.find(x=>x.id===prev)));document.querySelectorAll(".item.on").forEach(x=>x.classList.remove("on"))}
 const ICON={
@@ -1300,7 +1491,11 @@ function openPlace(id,fly){
     $("#hCopy").onclick=async e=>{try{await navigator.clipboard.writeText(HOME.plus);e.currentTarget.lastChild.textContent="Скопировано"}catch(err){const r=document.createRange();r.selectNodeContents($("#pc"));getSelection().removeAllRanges();getSelection().addRange(r)}};
   }else{
     const tips=(p.tips||[]).map(t=>`<li><span>${esc(t)}</span></li>`).join("");
-    c.innerHTML=`<div class="hero">${p.img?`<img src="${p.img}" alt="${esc(p.name)}" data-cat="${esc(p.cat)}" data-big="1">`:`<div class="noimg" style="background:${col(p.cat)}">${svg(p.cat,56)}</div>`}<button class="fab l" id="cBack" aria-label="К списку">${ICON.back}</button>${p.img?'<span class="credit">Фото: Google Maps</span>':""}</div>
+    const gal=[...(p.img?[{u:p.img,a:p.imgBy||"Google Maps"}]:[]),...(p.photos||[])];const oi=openInfo(p);
+    const near=PLACES.filter(x=>x.id!==id).map(x=>[x,hav(p.lat,p.lng,x.lat,x.lng)]).filter(x=>x[1]<6000).sort((a,b)=>a[1]-b[1]).slice(0,6);
+    c.innerHTML=`<div class="hero">${gal.length?`<div class="gal" id="gal">${gal.map((g,k)=>`<img src="${esc(g.u)}" alt="${esc(p.name)}" ${k?'loading="lazy"':""} data-cat="${esc(p.cat)}" data-big="1">`).join("")}</div>`:`<div class="noimg" style="background:${col(p.cat)}">${svg(p.cat,56)}</div>`}<button class="fab l" id="cBack" aria-label="К списку">${ICON.back}</button>
+      <button class="fab r" id="cShare" aria-label="Поделиться"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7.5 7.5 12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
+      ${gal.length>1?`<span class="gdots" id="gdots">${gal.map((g,k)=>`<i class="${k?"":"on"}"></i>`).join("")}</span>`:""}${gal.length?`<span class="credit" id="gcred">Фото: ${esc(gal[0].a)}</span>`:""}</div>
     <div class="cbody">
       <div><span class="badge" style="background:${col(p.cat)}"><i>${svg(p.cat,11)}</i>${esc(p.cat)}</span>${p.isNew?' <span class="tag new" style="font-size:12px">новое</span>':""}
         <h2 style="margin-top:10px">${esc(p.name)}</h2>
@@ -1311,6 +1506,7 @@ function openPlace(id,fly){
         <button class="act" id="cFav" aria-pressed="${favs.has(id)}"><span class="c">${ICON.fav}</span>${favs.has(id)?"В избранном":"Избранное"}</button>
         <button class="act" id="cVis" aria-pressed="${visited.has(id)}"><span class="c">${ICON.check}</span>${visited.has(id)?"Был(а)":"Был(а)?"}</button>
       </div>
+      <div class="row"><button class="pill" id="cTrip">${ICON.route}В поездку</button>${oi?`<span class="ostat ${oi.open?"ok":"no"}">${esc(oi.txt)}</span>`:""}${(p.tags||[]).map(t=>`<span class="ptag">${esc(t)}</span>`).join("")}</div>
       <p class="desc">${esc(p.desc)}</p>
       <div class="facts">
         <div class="fact">${ICON.cash}<div>${esc(p.price||"уточняйте на месте")}${p.updated?`<small>данные ${esc(p.updated)} г.</small>`:""}</div></div>
@@ -1322,13 +1518,20 @@ function openPlace(id,fly){
       </div>
       ${tips?`<div class="sec"><h3>Советы</h3><ul class="tips">${tips}</ul></div>`:""}
       ${p.fact?`<div class="note">${esc(p.fact)}</div>`:""}
+      <div class="sec"><h3>Моя заметка</h3><textarea id="cNote" rows="2" placeholder="Например: лучше приехать к 7 утра, взять наличные">${esc(notes[id]||"")}</textarea></div>
+      ${near.length?`<div class="sec"><h3>Рядом с этим местом</h3><div class="hscroll small">${near.map(([x,d])=>`<button class="nc" data-near2="${x.id}">${x.thumb?`<img src="${x.thumb}" alt="" loading="lazy" data-cat="${esc(x.cat)}">`:`<span class="noimg" style="background:${col(x.cat)}">${svg(x.cat,20)}</span>`}<span><b>${esc(x.name)}</b><small>${fmtKm(d/1000)} · ${esc(x.cat)}</small></span></button>`).join("")}</div></div>`:""}
       <div class="src"><span>Нашли в: ${esc(p.srcLabel)}</span>${(p.sources||[]).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u.replace(/^https?:\/\/(www\.)?/,"").slice(0,70))}</a>`).join("")}</div>
     </div>`;
     $("#cRoute").onclick=()=>startRoute("home",id);
     $("#cFromHome").onclick=()=>startRoute("home",id);
     $("#copy").onclick=async e=>{const t=$("#coord").textContent;try{await navigator.clipboard.writeText(t);e.target.textContent="скопировано"}catch(err){const r=document.createRange();r.selectNodeContents($("#coord"));getSelection().removeAllRanges();getSelection().addRange(r);e.target.textContent="выделено"}};
-    $("#cFav").onclick=()=>{favs.has(id)?favs.delete(id):favs.add(id);store.set("bali-favs",[...favs]);openPlace(id,false);render()};
-    $("#cVis").onclick=()=>{visited.has(id)?visited.delete(id):visited.add(id);store.set("bali-visited",[...visited]);openPlace(id,false);render()};
+    $("#cFav").onclick=()=>{toggleFav(id);openPlace(id,false);render()};
+    $("#cVis").onclick=()=>{toggleVisited(id);openPlace(id,false);render();renderNear()};
+    $("#cTrip").onclick=()=>addToTrip(id);
+    $("#cShare").onclick=()=>shareLink(p.name,"#p"+id);
+    let nt;$("#cNote").oninput=e=>{clearTimeout(nt);nt=setTimeout(()=>{const v=e.target.value.trim();if(v)notes[id]=v;else delete notes[id];store.set("bali-notes",notes)},400)};
+    c.querySelectorAll("[data-near2]").forEach(b=>b.onclick=()=>openPlace(+b.dataset.near2,true));
+    const G2=$("#gal");if(G2&&gal.length>1)G2.addEventListener("scroll",()=>{const k=Math.round(G2.scrollLeft/G2.clientWidth);document.querySelectorAll("#gdots i").forEach((d,j)=>d.classList.toggle("on",j===k));$("#gcred").textContent="Фото: "+(gal[k]||gal[0]).a},{passive:true});
     const it=document.querySelector(`.item[data-id="${id}"]`);if(it)it.classList.add("on");
   }
   $("#cBack").onclick=()=>{deselect();showView("vList");setSheet("half")};
@@ -1424,11 +1627,11 @@ async function computeRoute(o={}){const quiet=!!o.quiet;
    <div class="steps"><div>Обычно ${fmtDur(lo)} – ${fmtDur(hi)}: в Чангу, Убуде и на Буките в часы пик дорога дольше.</div></div>
    <div class="bar">${bars}</div><div class="legend2">${leg}</div>
    ${(walkA>300||walkB>300)?`<div class="warn">${walkA>300?`Начальная точка в ${Math.round(walkA)} м от ближайшей дороги на карте. `:""}${walkB>300?`Последние ${Math.round(walkB)} м до места — пешком или по тропе.`:""}</div>`:""}
-   <div class="row"><button class="btn pri go" id="rGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button><a class="btn" href="${gmUrl}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${rState.b!=="me"?`<button class="btn" id="rBack">${ICON.back}К месту</button>`:""}</div>
+   <div class="row"><button class="btn pri go" id="rGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button><a class="btn" href="${gmUrl}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${rState.b!=="me"?`<button class="btn" id="rBack">${ICON.back}К месту</button>`:""}${offlineOK()?`<button class="btn" id="rOff">Сохранить карту офлайн</button>`:""}</div>
    <details class="tbt"><summary>Пошагово · ${ST.mans.length-1} ${plural(ST.mans.length-1,"поворот","поворота","поворотов")}</summary><ol>${ST.mans.map((m,i)=>`<li><button data-m="${i}"><span class="ti">${arrowSVG(m.a)}</span><span><b>${esc(m.a==="finish"?"Прибытие: "+B.name:m.text)}</b><small>${fmtDist(m.cum)} от старта</small></span></button></li>`).join("")}</ol></details>
    <div class="steps"><div>Скорость для байка: трасса 45–55 км/ч, главные дороги 40, местные 25–30, улочки 20. Пробки, дождь и паромы не учитываются.</div></div>`;
   if($("#rBack"))$("#rBack").onclick=()=>{const id=rState.b;if(id!==null&&id!=="me"){showMarkers(true);openPlace(id,false)}};
-  $("#rGo").onclick=startNav;
+  $("#rGo").onclick=startNav;if($("#rOff"))$("#rOff").onclick=()=>saveOffline(flat);
   box.querySelector(".tbt ol").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b||!curRoute)return;const m=curRoute.mans[+b.dataset.m];if(isPhone())setSheet("half");flyCenter(m.ll,17,"half")});
 }
 
@@ -1453,7 +1656,7 @@ function onFix(pos){const c=pos.coords;const n={lat:c.latitude,lng:c.longitude,a
   const b=$("#locBtn");b.classList.remove("busy");b.classList.toggle("on",follow);
   fixWaiters.splice(0).forEach(f=>f(me));
   if(nav){navTick();return}
-  if(first){if(me.bali){follow=true;b.classList.add("on");flyCenter([me.lat,me.lng],Math.max(map.getZoom(),15),sMode==="full"?"half":sMode)}else{follow=false;toast("Вы сейчас не на Бали — маршрут от вашей точки построить не получится")}}
+  if(first){renderNear();if(me.bali){follow=true;b.classList.add("on");flyCenter([me.lat,me.lng],Math.max(map.getZoom(),15),sMode==="full"?"half":sMode)}else{follow=false;toast("Вы сейчас не на Бали — маршрут от вашей точки построить не получится")}}
   else if(follow&&me.bali)map.panTo(viewCenter([me.lat,me.lng],map.getZoom()),{animate:true,duration:.5})}
 function onFixErr(err){$("#locBtn").classList.remove("busy");
   if(err.code===1){stopWatch();toast("Нет доступа к геолокации. Разрешите её в настройках телефона для этого приложения (или для Safari/Chrome).")}
@@ -1516,7 +1719,8 @@ async function startNav(){
   if(!me||Date.now()-me.t>15000){toast("Определяю, где вы…");try{await waitFix()}catch(e){toast("Не удалось определить местоположение. Включите геолокацию и попробуйте ещё раз.");return}}
   if(!me.bali){toast("Вы сейчас не на Бали — навигация работает только на острове");return}
   nav={idx:0,off:0,lastRe:0,voice:store.get("bali-voice",true),said:new Set(),arrived:false};
-  if(rState.a!=="me"){rState.a="me";$("#rA").value=ptOf("me").name;await computeRoute({quiet:true})}
+  if(curRoute&&curRoute.trip){if(curRoute.A.name!=="Моё местоположение")await computeTrip(curRoute.trip,{quiet:true,from:"me",stops:curRoute.remaining})}
+  else if(rState.a!=="me"){rState.a="me";$("#rA").value=ptOf("me").name;await computeRoute({quiet:true})}
   if(!curRoute){nav=null;return}
   document.body.classList.add("nav");$("#navBan").hidden=$("#navBar").hidden=false;$("#nbSnd").classList.toggle("off",!nav.voice);
   follow=true;$("#locBtn").classList.add("on");keepAwake();
@@ -1537,7 +1741,7 @@ function snap(R,lat,lng,from){const kx=Math.cos(lat*rad)*111320,ky=110540;let be
 async function navTick(){if(!nav||!curRoute||!me)return;const R=curRoute;
   const s=snap(R,me.lat,me.lng,nav.idx);
   if(s.d>Math.max(45,(me.acc||0)*1.2)){nav.off++;
-    if(nav.off>=2&&Date.now()-nav.lastRe>8000&&!nav.arrived){nav.lastRe=Date.now();nav.off=0;nav.idx=0;nav.said.clear();say("Перестраиваю маршрут");rState.a="me";await computeRoute({quiet:true});if(nav)navTick();return}}
+    if(nav.off>=2&&Date.now()-nav.lastRe>8000&&!nav.arrived){nav.lastRe=Date.now();nav.off=0;nav.idx=0;nav.said.clear();say("Перестраиваю маршрут");if(R.trip){const fin=R.mans.filter(m=>m.a==="finish");const left=R.remaining.filter((id,i)=>fin[i]&&fin[i].cum>(R.cum[nav.idx]||0));await computeTrip(R.trip,{quiet:true,from:"me",stops:left.length?left:R.remaining})}else{rState.a="me";await computeRoute({quiet:true})}if(nav)navTick();return}}
   else{nav.off=0;nav.idx=s.j}
   const prog=s.d<=Math.max(45,(me.acc||0)*1.2)?s.along:R.cum[nav.idx];
   const total=R.cum[R.cum.length-1],rem=Math.max(0,total-prog);
@@ -1545,7 +1749,7 @@ async function navTick(){if(!nav||!curRoute||!me)return;const R=curRoute;
   const mi=R.mans.findIndex(m=>m.cum>prog+8);const m=R.mans[mi<0?R.mans.length-1:mi];const dist=Math.max(0,m.cum-prog);
   if(rem<35||mi<0){if(!nav.arrived){nav.arrived=true;say("Вы на месте. "+R.B.name)}
     $("#nbIc").innerHTML=arrowSVG("finish");$("#nbDist").textContent="Вы на месте";$("#nbText").textContent=R.B.name;$("#nbThen").textContent=""}
-  else{$("#nbIc").innerHTML=arrowSVG(m.a);$("#nbDist").textContent=fmtDist(dist);$("#nbText").textContent=m.a==="finish"?"Прибытие: "+R.B.name:m.text;
+  else{$("#nbIc").innerHTML=arrowSVG(m.a);$("#nbDist").textContent=fmtDist(dist);$("#nbText").textContent=m.a==="finish"?(m.name&&m.text.startsWith("Остановка")?m.text:"Прибытие: "+R.B.name):m.text;
     const nx=R.mans[mi+1];$("#nbThen").textContent=nx&&nx.cum-m.cum<200?"Затем: "+(nx.a==="finish"?"вы на месте":nx.text.split(",")[0].toLowerCase()):"";
     const key=mi+":";if(dist<260&&dist>90&&!nav.said.has(key+"far")){nav.said.add(key+"far");say(sayDist(dist)+" "+(m.a==="finish"?"вы на месте":m.text.toLowerCase()))}
     if(dist<=45&&!nav.said.has(key+"now")){nav.said.add(key+"now");say(m.a==="finish"?"Вы на месте":m.text)}}
@@ -1554,8 +1758,258 @@ async function navTick(){if(!nav||!curRoute||!me)return;const R=curRoute;
   if(follow){const z=Math.max(map.getZoom(),16);map.setView(viewCenter([me.lat,me.lng],z),z,{animate:true,duration:.6})}}
 
 
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#info").hidden)$("#info").hidden=true;else if(!$("#vCard").hidden){deselect();showView("vList")}}});
-render();
+/* ================= v2: tabs, catalog, trips, my places, settings ================= */
+const RU=new Intl.DateTimeFormat("ru-RU",{timeZone:"Asia/Makassar",weekday:"short",hour:"2-digit",minute:"2-digit",hourCycle:"h23"});
+const DOWN={вс:0,пн:1,вт:2,ср:3,чт:4,пт:5,сб:6};
+function baliNow(){const parts=Object.fromEntries(RU.formatToParts(new Date()).map(x=>[x.type,x.value]));
+  return {d:DOWN[(parts.weekday||"").toLowerCase().slice(0,2)]??new Date().getDay(),m:(+parts.hour)*60+(+parts.minute)}}
+const hm=m=>String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+const hoursCache=new Map();
+function parseHours(h){if(!h)return null;if(hoursCache.has(h))return hoursCache.get(h);let r=null;const s=h.toLowerCase();
+  if(/круглосуточно/.test(s))r={all:true};
+  else if(!/заезд|выезд|сеанс|шоу|буфет|сауна|лучше всего|бассейн до/.test(s)){const rules=[];
+    for(const seg of s.split(/[;,]/)){const t=seg.match(/(\d{1,2})[:.](\d{2})\s*[–—-]\s*(\d{1,2})[:.](\d{2})/);
+      const dm=seg.match(/(пн|вт|ср|чт|пт|сб|вс)\s*[–—-]\s*(пн|вт|ср|чт|пт|сб|вс)/);const one=!dm&&seg.match(/(?:^|\s)(пн|вт|ср|чт|пт|сб|вс)(?=\s|$)/);
+      let days=null;if(dm){days=[];let d=DOWN[dm[1]];for(let k=0;k<7;k++){days.push(d);if(d===DOWN[dm[2]])break;d=(d+1)%7}}else if(one)days=[DOWN[one[1]]];
+      if(/выходной/.test(seg)){if(days)rules.push({days,closed:true});continue}
+      if(!t||(/последний|процедуры|спа\s|заказ/.test(seg)&&rules.length))continue;
+      let o=+t[1]*60+ +t[2],c=+t[3]*60+ +t[4];if(c===0)c=1440;rules.push({days,o,c})}
+    if(rules.some(x=>!x.closed))r={rules}}
+  hoursCache.set(h,r);return r}
+// {open:true|false, txt} or null when unknown
+function openInfo(p){const H=parseHours(p.hours);if(!H)return null;if(H.all)return {open:true,txt:"Открыто круглосуточно"};
+  const n=baliNow();const today=H.rules.filter(r=>!r.days||r.days.includes(n.d));
+  // overnight rule from yesterday (e.g. 09:00–02:00)
+  const y=(n.d+6)%7;for(const r of H.rules)if(!r.closed&&r.c<r.o&&(!r.days||r.days.includes(y))&&n.m<r.c)return {open:true,txt:"Открыто до "+hm(r.c)};
+  if(!today.length)return null;if(today.some(r=>r.closed))return {open:false,txt:"Сегодня выходной"};
+  for(const r of today){const c=r.c<r.o?1440:r.c;if(n.m>=r.o&&n.m<c)return {open:true,txt:"Открыто до "+hm(r.c)}}
+  const next=today.filter(r=>r.o>n.m).sort((a,b)=>a.o-b.o)[0];return {open:false,txt:next?"Закрыто · откроется в "+hm(next.o):"Сейчас закрыто"}}
+
+/* ---------- my data (this device) ---------- */
+const notes=store.get("bali-notes",{}),visitedAt=store.get("bali-visited-at",{});
+let trips=store.get("bali-trips",[]),activeTrip=store.get("bali-trip-active",null);
+const saveTrips=()=>{store.set("bali-trips",trips);store.set("bali-trip-active",activeTrip);updateTripBadge()};
+function toggleVisited(id){if(visited.has(id)){visited.delete(id);delete visitedAt[id]}else{visited.add(id);visitedAt[id]=new Date().toISOString().slice(0,10)}
+  store.set("bali-visited",[...visited]);store.set("bali-visited-at",visitedAt)}
+function toggleFav(id){favs.has(id)?favs.delete(id):favs.add(id);store.set("bali-favs",[...favs])}
+const byId=id=>PLACES.find(x=>x.id===id);
+const kmFromMe=p=>me&&me.bali?hav(me.lat,me.lng,p.lat,p.lng)/1000:null;
+
+/* ---------- my home (friends can set their own) ---------- */
+const HOME0={...HOME};
+function applyHome(h){Object.assign(HOME,h||HOME0);PLACES.forEach(p=>p.homeKm=hav(HOME.lat,HOME.lng,p.lat,p.lng)/1000);homeM.setLatLng([HOME.lat,HOME.lng]);render();renderNear()}
+const savedHome=store.get("bali-home",null);if(savedHome)applyHome(savedHome);
+let pickHome=false;
+map.on("click",e=>{if(!pickHome)return;pickHome=false;document.body.classList.remove("picking");
+  const h={name:"Мой дом",addr:"Точка, выбранная на карте",plus:"",lat:+e.latlng.lat.toFixed(6),lng:+e.latlng.lng.toFixed(6)};h.gm=`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}`;
+  store.set("bali-home",h);applyHome(h);toast("Дом сохранён на этом устройстве")});
+
+/* ---------- tabs ---------- */
+let tab="map";const pages={places:"#pgPlaces",trips:"#pgTrips",me:"#pgMe",more:"#pgMore"};
+function switchTab(t){if(nav&&t!=="map")return;tab=t;document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.toggleAttribute("aria-current",b.dataset.tab===t));
+  Object.entries(pages).forEach(([k,sel])=>$(sel).hidden=k!==t);document.body.classList.toggle("onpage",t!=="map");
+  if(t==="places")renderPlaces();if(t==="trips")renderTrips();if(t==="me")renderMe();if(t==="more")renderMore();
+  if(t!=="map"){const pg=$(pages[t]);pg.querySelector(".pbody").scrollTop=0}else if(isPhone())applyH(snapH(sMode),false)}
+$("#tabbar").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b)switchTab(b.dataset.tab)});
+function goToPlace(id){switchTab("map");openPlace(id,true)}
+function updateTripBadge(){const t=trips.find(x=>x.id===activeTrip);const n=t?t.stops.length:0;const b=$("#tripBadge");b.hidden=!n;b.textContent=n}
+
+/* ---------- reusable place card (photo) ---------- */
+function pcard(p,o={}){const km=kmFromMe(p),oi=openInfo(p);
+  return `<button class="pc ${o.wide?"wide":""}" data-go="${p.id}">${p.img?`<img loading="lazy" src="${p.thumb&&o.small?p.thumb:p.img}" alt="" data-cat="${esc(p.cat)}">`:`<span class="noimg" style="background:${col(p.cat)}">${svg(p.cat,30)}</span>`}
+   ${favs.has(p.id)?'<i class="pfav">★</i>':""}${visited.has(p.id)?'<i class="pvis">✓</i>':""}
+   <span class="pct"><b>${esc(p.name)}</b><span class="pcs"><i style="background:${col(p.cat)}"></i>${esc(p.cat)}${p.rating?` · <em>★ ${String(p.rating).replace(".",",")}</em>`:""}</span>
+   <span class="pcs">${km!=null?fmtKm(km)+" от вас":fmtKm(p.homeKm)+" от дома"}${oi?` · <span class="${oi.open?"ok":"no"}">${oi.open?"открыто":"закрыто"}</span>`:""}</span></span></button>`}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b&&!b.closest("#list")){e.preventDefault();goToPlace(+b.dataset.go)}});
+
+/* ---------- catalog «Места» ---------- */
+const TAGN={"закат":"На закат","рассвет":"На рассвет","без толп":"Без толп","дождь":"Если дождь","купание":"Искупаться","треккинг":"Прогулки и треккинг","работа":"Кафе для работы","романтика":"Романтика","с детьми":"С детьми","бюджет":"Бесплатно и недорого"};
+const byRating=(a,b)=>(b.rating||0)-(a.rating||0)||(b.reviews||0)-(a.reviews||0);
+function collections(){const C=[];
+  if(me&&me.bali)C.push({k:"near",t:"Рядом с вами",ps:[...PLACES].sort((a,b)=>kmFromMe(a)-kmFromMe(b)).slice(0,12),keepOrder:1});
+  const open=PLACES.filter(p=>openInfo(p)?.open);if(open.length)C.push({k:"open",t:"Открыто сейчас",ps:open});
+  ["закат","без толп","дождь","купание","работа","треккинг","романтика","с детьми","рассвет"].forEach(t=>{const ps=PLACES.filter(p=>(p.tags||[]).includes(t));if(ps.length>=3)C.push({k:"tag:"+t,t:TAGN[t],ps})});
+  C.push({k:"top",t:"Лучшие по отзывам",ps:PLACES.filter(p=>p.rating>=4.7&&p.reviews>=300)});
+  const nw=PLACES.filter(p=>p.isNew);if(nw.length)C.push({k:"new",t:"Новые места",ps:nw});
+  C.push({k:"free",t:"Бесплатно",ps:PLACES.filter(p=>p.level===0)});
+  C.forEach(c=>{if(!c.keepOrder)c.ps=[...c.ps].sort(byRating)});return C}
+const pstate={q:"",f:new Set(),view:null,sort:"rating"};
+function pfilter(ps){return ps.filter(p=>{
+  if(pstate.q&&!(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" ")).toLowerCase().includes(pstate.q))return false;
+  if(pstate.f.has("open")&&!openInfo(p)?.open)return false;if(pstate.f.has("free")&&p.level!==0)return false;
+  if(pstate.f.has("new")&&visited.has(p.id))return false;if(pstate.f.has("fav")&&!favs.has(p.id))return false;return true})}
+function psort(ps){const s=[...ps];if(pstate.sort==="near")s.sort((a,b)=>(kmFromMe(a)??a.homeKm)-(kmFromMe(b)??b.homeKm));else if(pstate.sort==="rating")s.sort(byRating);return s}
+function renderPlaces(){const B=$("#placesBody");
+  $("#pChips").innerHTML=[["near",me&&me.bali?"Ближе ко мне":"Ближе к дому"],["open","Открыто сейчас"],["free","Бесплатно"],["new","Ещё не была"],["fav","Избранное"]]
+    .map(([k,t])=>`<button class="pill" data-pf="${k}" aria-pressed="${k==="near"?pstate.sort==="near":pstate.f.has(k)}">${t}</button>`).join("");
+  const filtering=pstate.q||pstate.f.size||pstate.sort==="near";
+  if(pstate.view||filtering){const v=pstate.view||{t:"Результаты",ps:PLACES};const ps=psort(pfilter(v.ps));
+    B.innerHTML=`<div class="dhead">${pstate.view?`<button class="sbtn" id="pBack" aria-label="Назад">${ICON.back}</button>`:""}<div><h2>${esc(v.t)}</h2><small>${ps.length} ${plural(ps.length,"место","места","мест")}</small></div>
+      ${ps.length?`<button class="pill" id="pOnMap">${ICON.gmap}На карте</button>`:""}</div>
+      ${v.desc?`<p class="ddesc">${esc(v.desc)}</p>`:""}
+      <div class="grid">${ps.map(p=>pcard(p)).join("")||'<div class="empty">Ничего не нашлось. Попробуйте убрать фильтры.</div>'}</div>`;
+    if($("#pBack"))$("#pBack").onclick=()=>{pstate.view=null;renderPlaces()};
+    if($("#pOnMap"))$("#pOnMap").onclick=()=>{showOnMap(v.t,ps.map(p=>p.id))};return}
+  const C=collections();
+  const cats=ALLC.map(c=>`<button class="catb" data-pv="cat:${esc(c)}"><i style="background:${col(c)}">${svg(c,20)}</i><span>${esc(c)}</span><small>${catCount[c]}</small></button>`).join("");
+  const regs=regions.map(r=>{const ps=PLACES.filter(p=>p.region===r);const cover=[...ps].filter(p=>p.img).sort(byRating)[0];const km=Math.min(...ps.map(p=>p.homeKm));
+    return `<button class="reg" data-pv="reg:${esc(r)}">${cover?`<img loading="lazy" src="${cover.img}" alt="">`:""}<span><b>${esc(r)}</b><small>${ps.length} ${plural(ps.length,"место","места","мест")} · от ${fmtKm(km)} от дома</small></span></button>`}).join("");
+  B.innerHTML=C.map((c,i)=>`<section class="coll"><div class="chd"><h2>${esc(c.t)}</h2><button class="link" data-pv="col:${i}">Все ${c.ps.length}</button></div>
+     <div class="hscroll">${c.ps.slice(0,10).map(p=>pcard(p,{small:0})).join("")}</div></section>`).join("")+
+    `<section class="coll"><div class="chd"><h2>Категории</h2></div><div class="cats">${cats}</div></section>
+     <section class="coll"><div class="chd"><h2>Районы</h2></div><div class="regs">${regs}</div></section>`;
+  B.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.pv.split(/:(.*)/s);
+    if(k==="cat")pstate.view={t:v,ps:PLACES.filter(p=>p.cat===v)};
+    else if(k==="reg")pstate.view={t:v,ps:PLACES.filter(p=>p.region===v)};
+    else{const c=collections()[+v];pstate.view={t:c.t,ps:c.ps}}
+    renderPlaces();$("#placesBody").scrollTop=0})}
+$("#pChips").addEventListener("click",e=>{const b=e.target.closest("[data-pf]");if(!b)return;const k=b.dataset.pf;
+  if(k==="near")pstate.sort=pstate.sort==="near"?"rating":"near";else pstate.f.has(k)?pstate.f.delete(k):pstate.f.add(k);renderPlaces()});
+$("#pq").addEventListener("input",e=>{pstate.q=e.target.value.trim().toLowerCase();renderPlaces()});
+// show a set of places on the map list (keeps other filters off)
+function showOnMap(title,ids){Object.assign(state,{q:"",cats:new Set(),region:"",price:"",favOnly:false,hideVisited:false});$("#q").value="";$("#region").value="";$("#price").value="";
+  state.ids=new Set(ids);state.idsName=title;switchTab("map");showList();render(true);setSheet("half")}
+
+/* ---------- near carousel in the map sheet ---------- */
+function renderNear(){const el=$("#near");if(!el)return;const fromMe=me&&me.bali;
+  const ps=[...PLACES].filter(p=>!visited.has(p.id)).sort((a,b)=>fromMe?kmFromMe(a)-kmFromMe(b):a.homeKm-b.homeKm).slice(0,10);
+  $("#nearT").textContent=fromMe?"Рядом с вами":"Рядом с домом";
+  el.innerHTML=ps.map(p=>`<button class="nc" data-near="${p.id}">${p.thumb?`<img src="${p.thumb}" alt="" loading="lazy" data-cat="${esc(p.cat)}">`:`<span class="noimg" style="background:${col(p.cat)}">${svg(p.cat,20)}</span>`}<span><b>${esc(p.name)}</b><small>${fmtKm(fromMe?kmFromMe(p):p.homeKm)} · ${esc(p.cat)}</small></span></button>`).join("")}
+$("#near").addEventListener("click",e=>{const b=e.target.closest("[data-near]");if(b)openPlace(+b.dataset.near,true)});
+
+/* ---------- trips ---------- */
+const newTrip=()=>{const t={id:Date.now(),name:"Поездка "+new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"long"}),start:"home",stops:[]};trips.unshift(t);activeTrip=t.id;saveTrips();return t};
+function addToTrip(id){let t=trips.find(x=>x.id===activeTrip);if(!t)t=newTrip();if(t.stops.includes(id)){toast("Уже в поездке «"+t.name+"»");return}
+  t.stops.push(id);saveTrips();toast(`Добавлено в «${t.name}» · мест: ${t.stops.length}`)}
+let tripView=null;
+function renderTrips(){const B=$("#tripsBody");
+  if(tripView){const t=trips.find(x=>x.id===tripView);if(!t){tripView=null;return renderTrips()}
+    const stops=t.stops.map(byId).filter(Boolean);let legKm=0;const pts=[t.start==="home"?HOME:null,...stops].filter(Boolean);for(let i=1;i<pts.length;i++)legKm+=hav(pts[i-1].lat,pts[i-1].lng,pts[i].lat,pts[i].lng)/1000;
+    B.innerHTML=`<div class="dhead"><button class="sbtn" id="tBack" aria-label="К поездкам">${ICON.back}</button><input class="tname" id="tName" value="${esc(t.name)}" aria-label="Название поездки"></div>
+      <div class="tstart"><span>Старт:</span><button class="pill" data-ts="home" aria-pressed="${t.start==="home"}">Дом</button><button class="pill" data-ts="me" aria-pressed="${t.start==="me"}">Где я сейчас</button></div>
+      <ol class="stops">${stops.map((p,i)=>`<li><span class="sn">${i+1}</span>${p.thumb?`<img src="${p.thumb}" alt="" data-cat="${esc(p.cat)}">`:`<span class="noimg" style="background:${col(p.cat)}">${svg(p.cat,18)}</span>`}
+        <button class="sname" data-go="${p.id}"><b>${esc(p.name)}</b><small>${esc(p.cat)} · ${esc(p.area)}</small></button>
+        <span class="sact"><button class="sbtn" data-mv="${i}:-1" aria-label="Выше" ${i?"":"disabled"}>↑</button><button class="sbtn" data-mv="${i}:1" aria-label="Ниже" ${i<stops.length-1?"":"disabled"}>↓</button><button class="sbtn" data-rm="${i}" aria-label="Убрать">✕</button></span></li>`).join("")}</ol>
+      ${stops.length?"":`<div class="empty">Добавьте места: найдите ниже, выберите из избранного или нажмите «В поездку» в карточке места.</div>`}
+      <div class="tadd"><input id="tq" type="search" placeholder="Добавить место…" autocomplete="off" aria-label="Добавить место"><div class="tsugg" id="tsugg"></div></div>
+      ${favs.size?`<div class="tfav"><small>Из избранного:</small>${[...favs].map(byId).filter(p=>p&&!t.stops.includes(p.id)).map(p=>`<button class="pill" data-add="${p.id}">+ ${esc(p.name)}</button>`).join("")}</div>`:""}
+      ${stops.length?`<p class="tsum">${stops.length} ${plural(stops.length,"остановка","остановки","остановок")} · ≈${fmtKm(legKm)} по прямой</p>`:""}
+      <div class="tbtns">${stops.length>2?`<button class="btn" id="tOpt">Выгодный порядок</button>`:""}${stops.length?`<button class="btn pri" id="tMap">${ICON.route}Маршрут на карте</button><button class="btn" id="tShare">Поделиться</button>`:""}
+      <button class="btn danger" id="tDel">Удалить поездку</button></div>`;
+    const save=()=>{saveTrips();renderTrips()};
+    $("#tBack").onclick=()=>{tripView=null;renderTrips()};
+    $("#tName").onchange=e=>{t.name=e.target.value.trim()||t.name;saveTrips()};
+    B.querySelectorAll("[data-ts]").forEach(b=>b.onclick=()=>{t.start=b.dataset.ts;save()});
+    B.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const [i,d]=b.dataset.mv.split(":").map(Number);[t.stops[i],t.stops[i+d]]=[t.stops[i+d],t.stops[i]];save()});
+    B.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{t.stops.splice(+b.dataset.rm,1);save()});
+    B.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{t.stops.push(+b.dataset.add);activeTrip=t.id;save()});
+    const tq=$("#tq"),ts=$("#tsugg");tq.oninput=()=>{const q=tq.value.trim().toLowerCase();if(!q){ts.innerHTML="";return}
+      ts.innerHTML=PLACES.filter(p=>!t.stops.includes(p.id)&&(p.name+" "+p.area+" "+p.cat).toLowerCase().includes(q)).slice(0,8).map(p=>`<button data-add2="${p.id}"><i style="background:${col(p.cat)}"></i>${esc(p.name)}<small>${esc(p.area)}</small></button>`).join("")||'<div class="empty" style="padding:10px">Не нашлось</div>'};
+    ts.onclick=e=>{const b=e.target.closest("[data-add2]");if(b){t.stops.push(+b.dataset.add2);activeTrip=t.id;save();setTimeout(()=>$("#tq")&&$("#tq").focus(),0)}};
+    if($("#tOpt"))$("#tOpt").onclick=()=>{optimizeTrip(t);save();toast("Порядок остановок пересчитан по расстоянию")};
+    if($("#tMap"))$("#tMap").onclick=()=>{activeTrip=t.id;saveTrips();switchTab("map");computeTrip(t)};
+    if($("#tShare"))$("#tShare").onclick=()=>shareLink(t.name,"#trip="+encodeURIComponent(JSON.stringify({n:t.name,s:t.stops})));
+    $("#tDel").onclick=()=>{if(!confirm("Удалить поездку «"+t.name+"»?"))return;trips=trips.filter(x=>x.id!==t.id);if(activeTrip===t.id)activeTrip=trips[0]?.id??null;tripView=null;save()};
+    return}
+  B.innerHTML=`<p class="ddesc">Соберите день из нескольких мест: приложение выстроит выгодный порядок, посчитает время на байке и поведёт по точкам.</p>
+    <button class="btn pri wide" id="tNew">+ Новая поездка</button>
+    <div class="tlist">${trips.map(t=>{const ps=t.stops.map(byId).filter(Boolean);return `<button class="trip" data-trip="${t.id}"><span class="tcov">${ps.slice(0,3).map(p=>p.thumb?`<img src="${p.thumb}" alt="">`:`<span class="noimg" style="background:${col(p.cat)}"></span>`).join("")}</span>
+      <span><b>${esc(t.name)}</b><small>${ps.length} ${plural(ps.length,"место","места","мест")}${t.id===activeTrip?" · текущая":""}</small><small class="tnames">${ps.map(p=>esc(p.name)).join(" → ")}</small></span></button>`}).join("")||'<div class="empty">Пока нет поездок.</div>'}</div>`;
+  $("#tNew").onclick=()=>{tripView=newTrip().id;renderTrips()};
+  B.querySelectorAll("[data-trip]").forEach(b=>b.onclick=()=>{tripView=+b.dataset.trip;activeTrip=tripView;saveTrips();renderTrips()})}
+// nearest-neighbour + 2-opt on straight-line distances, start fixed
+function optimizeTrip(t){const S=t.start==="me"&&me?me:HOME;const P=t.stops.map(byId).filter(Boolean);if(P.length<3)return;
+  const d=(a,b)=>hav(a.lat,a.lng,b.lat,b.lng);let rest=[...P],cur=S,ord=[];while(rest.length){rest.sort((a,b)=>d(cur,a)-d(cur,b));cur=rest.shift();ord.push(cur)}
+  const len=o=>o.reduce((s,p,i)=>s+d(i?o[i-1]:S,p),0);let best=len(ord),imp=true;
+  while(imp){imp=false;for(let i=0;i<ord.length-1;i++)for(let k=i+1;k<ord.length;k++){const o=[...ord.slice(0,i),...ord.slice(i,k+1).reverse(),...ord.slice(k+1)];const L=len(o);if(L<best-1){best=L;ord=o;imp=true}}}
+  t.stops=ord.map(p=>p.id)}
+async function shareLink(title,hash){const url=location.href.split("#")[0]+hash;
+  try{if(navigator.share){await navigator.share({title,text:title+" — Бали без толп (нужен пароль)",url});return}}catch(e){if(e.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(url);toast("Ссылка скопирована. Друзьям понадобится пароль.")}catch(e){prompt("Скопируйте ссылку:",url)}}
+
+/* multi-stop route on the map */
+let curTrip=null;
+async function computeTrip(t,o={}){const quiet=!!o.quiet;curTrip=t;routeLayer.clearLayers();showMarkers(false);showView("vTrip");if(!quiet)setSheet("half");
+  const box=$("#tres");$("#tTitle").textContent=t.name;
+  let start=o.from||t.start;if(start==="me"&&(!me||!me.bali))start="home";
+  const stops=(o.stops||t.stops).map(byId).filter(Boolean);if(!stops.length){box.innerHTML='<div class="warn">В поездке нет мест.</div>';return}
+  const pts=[start==="me"?{lat:me.lat,lng:me.lng,name:"Моё местоположение"}:{lat:HOME.lat,lng:HOME.lng,name:"Дом"},...stops.map(p=>({lat:p.lat,lng:p.lng,name:p.name,id:p.id}))];
+  box.innerHTML=`<div class="steps"><div><span class="spin"></span> ${G?"Считаю маршрут…":"Загружаю дороги Бали (один раз, ~2,5 МБ)…"}</div></div>`;
+  try{await loadGraph()}catch(e){box.innerHTML='<div class="warn">Не удалось загрузить дорожную сеть. Проверьте интернет.</div>';gLoading=null;return}
+  await new Promise(r=>setTimeout(r,20));
+  const flat=[],cum=[],mans=[],legs=[];let secs=0,off=0,bad=[];
+  for(let i=1;i<pts.length;i++){const A=pts[i-1],B=pts[i];const na=nearest(A.lat,A.lng),nb=nearest(B.lat,B.lng);const res=na.i===nb.i?{secs:0,edges:[]}:dijkstra(na.i,nb.i);
+    if(!res){bad.push(B.name);legs.push({to:B,secs:null,m:0});continue}
+    const lf=[],ls=[];res.edges.forEach(e=>{ls.push(lf.length);edgeCoords(e).forEach(q=>lf.push(q))});if(!lf.length)lf.push([B.lat,B.lng],[B.lat,B.lng]);
+    const ST=res.edges.length?buildSteps(lf,ls,res.edges):{cum:new Float64Array([0,0]),mans:[{cum:0,ll:lf[0],a:"finish"}]};
+    const extra=(na.d+nb.d)*1.3;const lsecs=res.secs+extra/(15/3.6)+Math.min(res.edges.length,400)*2.5;secs+=lsecs;
+    lf.forEach((q,k)=>{flat.push(q);cum.push(off+ST.cum[k])});
+    ST.mans.forEach(m=>mans.push({...m,cum:m.cum+off,...(m.a==="finish"?{name:B.name,text:i===pts.length-1?"Вы на месте":"Остановка: "+B.name}:{})}));
+    const lm=ST.cum[ST.cum.length-1];legs.push({to:B,secs:lsecs,m:lm+extra});off+=lm}
+  const meters=legs.reduce((s,l)=>s+l.m,0);
+  if(flat.length>1){L.polyline(flat,{color:"#ffffff",weight:10,opacity:.95,lineJoin:"round"}).addTo(routeLayer);L.polyline(flat,{color:"#2f6fde",weight:6,opacity:1,lineJoin:"round"}).addTo(routeLayer)}
+  L.circleMarker([pts[0].lat,pts[0].lng],{radius:7,color:"#fff",weight:3,fillColor:"#2f6fde",fillOpacity:1}).addTo(routeLayer);
+  pts.slice(1).forEach((p,i)=>L.marker([p.lat,p.lng],{zIndexOffset:2500,icon:L.divIcon({className:"",html:`<div class="snum">${i+1}</div>`,iconSize:[26,26],iconAnchor:[13,13]})}).on("click",()=>openPlace(p.id,false)).addTo(routeLayer));
+  curRoute=flat.length>1?{flat,cum:Float64Array.from(cum),mans,secs,A:pts[0],B:pts[pts.length-1],trip:t,remaining:pts.slice(1).map(p=>p.id)}:null;
+  if(!quiet)map.fitBounds(L.latLngBounds(pts.map(p=>[p.lat,p.lng]).concat(flat.length?[flat[0]]:[])),padFor("half"));
+  const wp=pts.slice(1,-1).map(p=>p.lat+","+p.lng).join("|");const last=pts[pts.length-1];
+  const gm=`https://www.google.com/maps/dir/?api=1&origin=${pts[0].lat},${pts[0].lng}&destination=${last.lat},${last.lng}${wp?"&waypoints="+encodeURIComponent(wp):""}&travelmode=driving`;
+  box.innerHTML=`<div class="big"><strong>${fmtDur(secs)}</strong><span>${(meters/1000).toFixed(1).replace(".",",")} км на байке в дороге</span></div>
+    <div class="steps"><div>Плюс время на сами места. ${bad.length?"":"Порядок можно поменять в разделе «Поездки»."}</div></div>
+    ${bad.length?`<div class="warn">По дорогам не доехать до: ${bad.map(esc).join(", ")}. На Нуса-Пениду и Лембонган — фастбот из Санура.</div>`:""}
+    <ol class="tl"><li><span class="tdot"></span><b>${esc(pts[0].name)}</b></li>${legs.map((l,i)=>`<li><small>${l.secs!=null?fmtDur(l.secs)+" · "+fmtKm(l.m/1000):"нет дороги"}</small><span class="tdot n">${i+1}</span><button data-go="${l.to.id}"><b>${esc(l.to.name)}</b></button></li>`).join("")}</ol>
+    <div class="row">${curRoute?`<button class="btn pri go" id="tGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button>`:""}<a class="btn" href="${gm}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${curRoute&&offlineOK()?`<button class="btn" id="tOff">Сохранить карту офлайн</button>`:""}</div>`;
+  if($("#tGo"))$("#tGo").onclick=startNav;if($("#tOff"))$("#tOff").onclick=()=>saveOffline(curRoute.flat)}
+$("#tripClose").onclick=()=>{stopNav();curTrip=null;curRoute=null;routeLayer.clearLayers();showMarkers(true);showView("vList");setSheet("peek")};
+$("#tripEdit").onclick=()=>{if(curTrip){tripView=curTrip.id;switchTab("trips")}};
+
+/* ---------- offline: save tiles along a route ---------- */
+const offlineOK=()=>"caches" in window&&!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+function tilesFor(flat){const set=new Set();const add=(z,lat,lng)=>{const n=2**z,x=Math.floor((lng+180)/360*n),s=Math.sin(lat*rad),y=Math.floor((.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n);
+    for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)set.add(z+"/"+(y+dy)+"/"+(x+dx))};
+  for(const z of [12,13,14,15,16]){let last=null;for(const q of flat){if(last&&hav(last[0],last[1],q[0],q[1])<(z<15?600:250))continue;last=q;add(z,q[0],q[1])}}
+  return [...set]}
+async function saveOffline(flat){const sat=store.get("bali-sat",false);const base=sat?ESRI+"World_Imagery/MapServer/tile/":"https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/";
+  const T=tilesFor(flat);if(!confirm(`Сохранить карту вдоль маршрута для работы без интернета? Это ${T.length} фрагментов карты, примерно ${Math.round(T.length*18/1024)} МБ.`))return;
+  const c=await caches.open("bali-offline");let done=0,fail=0;toast("Сохраняю карту… 0%");
+  const q=[...T];const worker=async()=>{while(q.length){const k=q.shift();const url=base+k;try{if(!(await c.match(url))){const r=await fetch(url,{mode:"cors"});if(r.ok)await c.put(url,r);else fail++}}catch(e){fail++}
+      done++;if(done%25===0)toast(`Сохраняю карту… ${Math.round(done/T.length*100)}%`)}};
+  await Promise.all([1,2,3,4].map(worker));toast(fail?`Сохранено ${done-fail} из ${T.length}. Часть не скачалась — попробуйте ещё раз.`:"Карта маршрута сохранена — работает без интернета")}
+
+/* ---------- «Моё» ---------- */
+function renderMe(){const B=$("#meBody");const F=[...favs].map(byId).filter(Boolean),V=[...visited].map(byId).filter(Boolean).sort((a,b)=>(visitedAt[b.id]||"").localeCompare(visitedAt[a.id]||"")),N=Object.keys(notes).filter(k=>notes[k]).map(k=>byId(+k)).filter(Boolean);
+  const pct=Math.round(V.length/PLACES.length*100);
+  B.innerHTML=`<div class="stats"><div><b>${V.length}</b><small>из ${PLACES.length} мест посещено</small><span class="bar"><i style="width:${pct}%;background:var(--sage)"></i></span></div><div><b>${F.length}</b><small>в избранном</small></div><div><b>${trips.length}</b><small>${plural(trips.length,"поездка","поездки","поездок")}</small></div></div>
+   <section class="coll"><div class="chd"><h2>Избранное</h2>${F.length?`<button class="link" id="mFavMap">На карте</button>`:""}</div>${F.length?`<div class="grid">${F.map(p=>pcard(p)).join("")}</div>`:'<div class="empty">Нажмите ★ в карточке места, чтобы сохранить его сюда.</div>'}</section>
+   <section class="coll"><div class="chd"><h2>Мои заметки</h2></div>${N.length?N.map(p=>`<button class="noteit" data-go="${p.id}"><b>${esc(p.name)}</b><span>${esc(notes[p.id])}</span></button>`).join(""):'<div class="empty">В карточке места можно оставить себе заметку: «лучше в 7 утра», «взять наличные».</div>'}</section>
+   <section class="coll"><div class="chd"><h2>Где я уже была</h2></div>${V.length?V.map(p=>`<button class="visit" data-go="${p.id}"><span class="vdot" style="background:${col(p.cat)}"></span><b>${esc(p.name)}</b><small>${visitedAt[p.id]?new Date(visitedAt[p.id]).toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"}):""}</small></button>`).join(""):'<div class="empty">Отмечайте «Был(а)» в карточке — здесь появится ваша история.</div>'}</section>`;
+  if($("#mFavMap"))$("#mFavMap").onclick=()=>showOnMap("Избранное",F.map(p=>p.id))}
+
+/* ---------- «Ещё» ---------- */
+function renderMore(){const custom=!!store.get("bali-home",null),sat=store.get("bali-sat",false),voice=store.get("bali-voice",true);
+  $("#homeInfo").innerHTML=`<b>${esc(custom?HOME.name:"Дом по умолчанию")}</b><small>${custom?esc(HOME.addr):"Отсюда считаются расстояния и маршруты"}</small>`;
+  $("#homeReset").hidden=!custom;$("#setSat").setAttribute("aria-pressed",sat);$("#setMap").setAttribute("aria-pressed",!sat);$("#setVoice").setAttribute("aria-pressed",voice);
+  $("#offRow").hidden=!offlineOK();
+  if(offlineOK()&&navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(e=>{$("#offSize").textContent="Занято на устройстве: "+Math.round((e.usage||0)/1048576)+" МБ"}).catch(()=>{})}
+$("#homeMe").onclick=async()=>{toast("Определяю, где вы…");try{await waitFix()}catch(e){toast("Не удалось определить местоположение");return}
+  if(!me.bali){toast("Вы сейчас не на Бали");return}const h={name:"Мой дом",addr:"Моё местоположение на момент сохранения",plus:"",lat:+me.lat.toFixed(6),lng:+me.lng.toFixed(6)};
+  h.gm=`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}`;store.set("bali-home",h);applyHome(h);renderMore();toast("Дом сохранён на этом устройстве")};
+$("#homePick").onclick=()=>{pickHome=true;document.body.classList.add("picking");switchTab("map");setSheet("peek");toast("Нажмите на карте, где ваш дом")};
+$("#homeReset").onclick=()=>{try{localStorage.removeItem("bali-home")}catch(e){}applyHome(null);renderMore();toast("Вернула дом по умолчанию")};
+$("#setSat").onclick=()=>{setLayer(true);renderMore()};$("#setMap").onclick=()=>{setLayer(false);renderMore()};
+$("#setVoice").onclick=()=>{const v=!store.get("bali-voice",true);store.set("bali-voice",v);if(nav)nav.voice=v;renderMore()};
+$("#offClear").onclick=async()=>{try{await caches.delete("bali-offline");await caches.delete("bali-tiles")}catch(e){}renderMore();toast("Сохранённые карты удалены")};
+
+/* ---------- deep links: #p123, #trip=… ---------- */
+function handleHash(){const h=decodeURIComponent(location.hash.slice(1));if(!h)return;
+  if(/^p\d+$/.test(h)&&byId(+h.slice(1))){goToPlace(+h.slice(1))}
+  else if(h.startsWith("trip=")){try{const o=JSON.parse(h.slice(5));const ids=(o.s||[]).map(Number).filter(byId);if(ids.length){const t={id:Date.now(),name:String(o.n||"Поездка").slice(0,60),start:"home",stops:ids};
+      trips.unshift(t);activeTrip=t.id;saveTrips();tripView=t.id;switchTab("trips");toast("Поездка добавлена: "+t.name)}}catch(e){}}
+  history.replaceState(null,"",location.pathname+location.search)}
+addEventListener("hashchange",handleHash);
+
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(tab!=="map")switchTab("map");else if(!$("#vCard").hidden){deselect();showView("vList")}}});
+render();renderNear();updateTripBadge();handleHash();
 window.balimap=map; // handy for debugging in the console
 document.addEventListener("error",e=>{const im=e.target;if(im.tagName!=="IMG"||!im.dataset.cat)return;const s=document.createElement(im.dataset.big?"div":"span");
   s.className="noimg";s.style.background=col(im.dataset.cat);s.innerHTML=svg(im.dataset.cat,im.dataset.big?56:26);im.replaceWith(s)},true);
