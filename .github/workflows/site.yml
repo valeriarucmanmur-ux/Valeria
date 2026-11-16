@@ -28,8 +28,6 @@ jobs:
           node-version: 22
       - name: Скачать фото мест
         run: npm run photos || echo "Часть фото не скачалась"
-      - name: Сжать фото
-        run: pip install -q pillow && python3 tools/optimize-photos.py
       - run: npm run check
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

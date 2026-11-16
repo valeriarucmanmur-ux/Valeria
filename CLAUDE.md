@@ -7,7 +7,7 @@
 ## Команды
 
 ```bash
-npm run photos   # один раз: скачать фото 157 старых мест в app/photos (37 новых уже лежат там)
+npm run photos   # докачать недостающие фото в app/photos (1600×1067 и превью 400×400), затем: python3 tools/optimize-photos.py
 npm run check    # проверка данных (нужен расшифрованный app/data/places.json или BALI_PASSWORD)
 npm start        # локальный сервер http://localhost:5173
 ```
@@ -22,7 +22,7 @@ app/
   data/places.enc.json  зашифрованные паролем данные { version, home, costs[], places[] } — публикуется только этот файл
   data/places.json      расшифрованная копия для правки (в .gitignore, НИКОГДА не коммитить)
   data/roads.json       дорожный граф Бали из OpenStreetMap для маршрутов (см. ниже)
-  photos/<id>.jpg       большое фото 1000×700; photos/<id>_t.jpg — превью 200×200
+  photos/<id>.jpg       большое фото до 1600 px (progressive JPEG q80); photos/<id>_t.jpg — превью 400×400. Лежат в репозитории
   vendor/               Leaflet 1.9.4 и Leaflet.markercluster 1.5.3 (локально, чтобы работало офлайн)
   icons/, manifest.webmanifest, sw.js   установка на телефон и офлайн-кэш
 tools/
