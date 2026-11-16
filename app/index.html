@@ -1825,6 +1825,8 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b
 /* ---------- catalog «Места» ---------- */
 const TAGN={"закат":"На закат","рассвет":"На рассвет","без толп":"Без толп","дождь":"Если дождь","купание":"Искупаться","треккинг":"Прогулки и треккинг","работа":"Кафе для работы","романтика":"Романтика","с детьми":"С детьми","бюджет":"Бесплатно и недорого"};
 const byRating=(a,b)=>(b.rating||0)-(a.rating||0)||(b.reviews||0)-(a.reviews||0);
+// photo quality first (2 good, 1 ok, 0 weak photo), then rating — keeps the catalog front page beautiful
+const byLook=(a,b)=>(b.img?(b.pq??1):-1)-(a.img?(a.pq??1):-1)||byRating(a,b);
 function collections(){const C=[];
   if(me&&me.bali)C.push({k:"near",t:"Рядом с вами",ps:[...PLACES].sort((a,b)=>kmFromMe(a)-kmFromMe(b)).slice(0,12),keepOrder:1});
   const open=PLACES.filter(p=>openInfo(p)?.open);if(open.length)C.push({k:"open",t:"Открыто сейчас",ps:open});
@@ -1832,7 +1834,7 @@ function collections(){const C=[];
   C.push({k:"top",t:"Лучшие по отзывам",ps:PLACES.filter(p=>p.rating>=4.7&&p.reviews>=300)});
   const nw=PLACES.filter(p=>p.isNew);if(nw.length)C.push({k:"new",t:"Новые места",ps:nw});
   C.push({k:"free",t:"Бесплатно",ps:PLACES.filter(p=>p.level===0)});
-  C.forEach(c=>{if(!c.keepOrder)c.ps=[...c.ps].sort(byRating)});return C}
+  C.forEach(c=>{if(!c.keepOrder)c.ps=[...c.ps].sort(byLook)});return C}
 const pstate={q:"",f:new Set(),view:null,sort:"rating"};
 function pfilter(ps){return ps.filter(p=>{
   if(pstate.q&&!(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" ")).toLowerCase().includes(pstate.q))return false;
@@ -1852,7 +1854,7 @@ function renderPlaces(){const B=$("#placesBody");
     if($("#pOnMap"))$("#pOnMap").onclick=()=>{showOnMap(v.t,ps.map(p=>p.id))};return}
   const C=collections();
   const cats=ALLC.map(c=>`<button class="catb" data-pv="cat:${esc(c)}"><i style="background:${col(c)}">${svg(c,20)}</i><span>${esc(c)}</span><small>${catCount[c]}</small></button>`).join("");
-  const regs=regions.map(r=>{const ps=PLACES.filter(p=>p.region===r);const cover=[...ps].filter(p=>p.img).sort(byRating)[0];const km=Math.min(...ps.map(p=>p.homeKm));
+  const regs=regions.map(r=>{const ps=PLACES.filter(p=>p.region===r);const cover=[...ps].filter(p=>p.img).sort(byLook)[0];const km=Math.min(...ps.map(p=>p.homeKm));
     return `<button class="reg" data-pv="reg:${esc(r)}">${cover?`<img loading="lazy" src="${cover.img}" alt="">`:""}<span><b>${esc(r)}</b><small>${ps.length} ${plural(ps.length,"место","места","мест")} · от ${fmtKm(km)} от дома</small></span></button>`}).join("");
   B.innerHTML=C.map((c,i)=>`<section class="coll"><div class="chd"><h2>${esc(c.t)}</h2><button class="link" data-pv="col:${i}">Все ${c.ps.length}</button></div>
      <div class="hscroll">${c.ps.slice(0,10).map(p=>pcard(p,{small:0})).join("")}</div></section>`).join("")+
