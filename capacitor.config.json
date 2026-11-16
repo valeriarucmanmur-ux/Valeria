@@ -1,0 +1,13 @@
+{
+  "appId": "com.valeria.balimap",
+  "appName": "Бали без толп",
+  "webDir": "app",
+  "backgroundColor": "#fffdf9",
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#fffdf9"
+  }
+}

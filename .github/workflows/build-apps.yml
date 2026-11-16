@@ -1,0 +1,79 @@
+name: Сборка приложений (Android + iOS)
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore: ["**.md"]
+  workflow_dispatch:
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - name: Скачать фото мест
+        run: npm run photos || echo "Часть фото не скачалась — в приложении будет значок категории"
+      - run: npm run check
+      - run: npx cap sync android
+      - name: Собрать APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk bali-bez-tolp.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bali-android-apk
+          path: bali-bez-tolp.apk
+      - name: Положить APK и фото в ветку builds
+        run: |
+          mkdir -p "$RUNNER_TEMP/out" && cp bali-bez-tolp.apk "$RUNNER_TEMP/out/" && cp -R app/photos "$RUNNER_TEMP/out/photos"
+          cd "$RUNNER_TEMP/out"
+          git init -q -b builds && git add -A
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -qm "Сборка ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" builds
+
+  ios:
+    name: iOS (неподписанный IPA)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Выбрать новейший Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+      - run: npm ci
+      - name: Скачать фото мест
+        run: npm run photos || echo "Часть фото не скачалась — в приложении будет значок категории"
+      - run: npx cap sync ios
+      - name: Собрать архив без подписи
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+      - name: Упаковать IPA
+        run: |
+          mkdir -p "$RUNNER_TEMP/Payload"
+          cp -R "$RUNNER_TEMP/App.xcarchive/Products/Applications/App.app" "$RUNNER_TEMP/Payload/"
+          (cd "$RUNNER_TEMP" && zip -qry bali-bez-tolp-unsigned.ipa Payload)
+          mv "$RUNNER_TEMP/bali-bez-tolp-unsigned.ipa" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bali-ios-unsigned-ipa
+          path: bali-bez-tolp-unsigned.ipa

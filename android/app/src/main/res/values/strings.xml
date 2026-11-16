@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Бали без толп</string>
+    <string name="title_activity_main">Бали без толп</string>
+    <string name="package_name">com.valeria.balimap</string>
+    <string name="custom_url_scheme">com.valeria.balimap</string>
+</resources>
