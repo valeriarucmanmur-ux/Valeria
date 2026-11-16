@@ -1005,7 +1005,7 @@ body.nav .leaflet-bottom{bottom:calc(84px + env(safe-area-inset-bottom,0px));opa
 .tabbar button[aria-current]{color:var(--accent);background:var(--accent-soft)}
 .tbadge{position:absolute;top:2px;right:14px;min-width:17px;height:17px;border-radius:9px;background:var(--accent);color:#fff;font-size:10.5px;font-style:normal;font-weight:800;display:grid;place-items:center;padding:0 4px}
 .tbadge[hidden]{display:none}
-body.nav .tabbar,body.picking .tabbar{display:none}
+body.nav .tabbar{display:none}
 body.picking #map{cursor:crosshair}
 .page{position:absolute;z-index:950;left:max(12px,env(safe-area-inset-left,0px));top:calc(12px + env(safe-area-inset-top,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:min(780px,calc(100vw - 24px));background:var(--paper);border-radius:var(--r);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;overflow:hidden}
 .page[hidden]{display:none}
@@ -1359,9 +1359,9 @@ const snapH=m=>m==="peek"?($("#vList").hidden?124:200):m==="half"?Math.round(inn
 let sMode="peek";
 function applyH(h,anim){sheet.style.transition=anim?"":"none";sheet.style.height=h+"px";document.body.style.setProperty("--sh",(h+TABH())+"px");document.body.classList.toggle("sfull",h>innerHeight*.62)}
 function setSheet(m){if(!isPhone())return;sMode=m;sheet.dataset.mode=m;document.body.dataset.sm=m;applyH(snapH(m),true);if(m!=="full")document.querySelectorAll(".list,.card,.rres").forEach(x=>{if(m==="peek")x.scrollTop=0})}
-const padFor=m=>isPhone()?{paddingTopLeft:[24,topBottom()+44],paddingBottomRight:[24,snapH(m)+24]}:{paddingTopLeft:[440,90],paddingBottomRight:[80,40]};
+const padFor=m=>isPhone()?{paddingTopLeft:[24,topBottom()+44],paddingBottomRight:[24,snapH(m)+TABH()+24]}:{paddingTopLeft:[440,90],paddingBottomRight:[80,40]};
 // Keep the point visible beside the sheet: shift the map centre left (desktop) or up into the free area (phone).
-function flyCenter(ll,z,m){let off;if(isPhone()){const top=topBottom(),bot=innerHeight-snapH(m||"half");off=L.point(0,(top+bot)/2-innerHeight/2)}else off=L.point(212,0);
+function flyCenter(ll,z,m){let off;if(isPhone()){const top=topBottom(),bot=innerHeight-snapH(m||"half")-TABH();off=L.point(0,(top+bot)/2-innerHeight/2)}else off=L.point(212,0);
   map.flyTo(map.unproject(map.project(ll,z).subtract(off),z),z,{duration:.7})}
 function fitIsland(){map.fitBounds([[-8.84,114.44],[-8.07,115.71]],isPhone()?padFor(sMode):{paddingTopLeft:[430,80],paddingBottomRight:[70,20]})}
 let toastT;function toast(msg){const el=$("#toast");el.textContent=msg;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,4200)}
@@ -1452,7 +1452,7 @@ $("#list").addEventListener("click",e=>{const b=e.target.closest("[data-id]");if
 
 /* ---------------- views ---------------- */
 function showView(id){["vList","vCard","vRoute","vTrip"].forEach(v=>$("#"+v).hidden=v!==id);sheet.classList.remove("hide")}
-function showList(){if(!$("#vRoute").hidden)return;deselect();showView("vList")}
+function showList(){if(!$("#vRoute").hidden||!$("#vTrip").hidden)return;deselect();showView("vList");if(isPhone())setSheet(sMode)}
 function deselect(){const prev=state.sel;state.sel=null;if(prev!==null&&prev!=="home"&&markers[prev])markers[prev].setIcon(pinIcon(PLACES.find(x=>x.id===prev)));document.querySelectorAll(".item.on").forEach(x=>x.classList.remove("on"))}
 const ICON={
  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
@@ -1470,13 +1470,14 @@ const ICON={
  back:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
  close:'<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.4" fill="none"><path d="M6 6l12 12M18 6 6 18"/></svg>'
 };
-function openPlace(id,fly){
+let cardFrom=null;
+function openPlace(id,fly){if(!$("#vRoute").hidden)cardFrom="vRoute";else if(!$("#vTrip").hidden)cardFrom="vTrip";else if($("#vCard").hidden)cardFrom=null;
   const isHome=id==="home";const p=isHome?HOME:PLACES.find(x=>x.id===id);if(!p)return;
   const prev=state.sel;state.sel=id;
   if(prev!==null&&prev!=="home"&&markers[prev])markers[prev].setIcon(pinIcon(PLACES.find(x=>x.id===prev)));
   if(!isHome)markers[id].setIcon(pinIcon(p));
   if(fly)flyCenter([p.lat,p.lng],Math.max(map.getZoom(),15));
-  else if(isPhone()){const y=map.latLngToContainerPoint([p.lat,p.lng]).y;if(y>innerHeight-snapH("half")-30||y<topBottom()+40)flyCenter([p.lat,p.lng],map.getZoom())}
+  else if(isPhone()){const y=map.latLngToContainerPoint([p.lat,p.lng]).y;if(y>innerHeight-snapH("half")-TABH()-30||y<topBottom()+40)flyCenter([p.lat,p.lng],map.getZoom())}
   document.querySelectorAll(".item.on").forEach(x=>x.classList.remove("on"));
   const dir=`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=driving`;
   const c=$("#card");
@@ -1534,7 +1535,7 @@ function openPlace(id,fly){
     const G2=$("#gal");if(G2&&gal.length>1)G2.addEventListener("scroll",()=>{const k=Math.round(G2.scrollLeft/G2.clientWidth);document.querySelectorAll("#gdots i").forEach((d,j)=>d.classList.toggle("on",j===k));$("#gcred").textContent="Фото: "+(gal[k]||gal[0]).a},{passive:true});
     const it=document.querySelector(`.item[data-id="${id}"]`);if(it)it.classList.add("on");
   }
-  $("#cBack").onclick=()=>{deselect();showView("vList");setSheet("half")};
+  $("#cBack").onclick=()=>{deselect();if(cardFrom){const v=cardFrom;cardFrom=null;showView(v);setSheet("half");return}showMarkers(true);showView("vList");setSheet("half")};
   c.scrollTop=0;showView("vCard");setSheet("half");
 }
 
@@ -1646,7 +1647,7 @@ function drawMe(){const ll=[me.lat,me.lng];
   else{meCircle.setLatLng(ll).setRadius(Math.min(me.acc||50,600));meMarker.setLatLng(ll)}
   const el=meMarker.getElement();if(el){const c=el.querySelector(".cone");if(me.hd!=null){c.style.display="block";c.style.transform=`rotate(${me.hd}deg)`}else c.style.display="none"}}
 // keep the dot inside the free part of the screen (above the sheet / lower third while navigating)
-function viewCenter(ll,z){let off;if(nav)off=L.point(0,-innerHeight*.2);else if(isPhone()){const top=topBottom(),bot=innerHeight-snapH(sMode==="full"?"half":sMode);off=L.point(0,(top+bot)/2-innerHeight/2)}else off=L.point(212,0);
+function viewCenter(ll,z){let off;if(nav)off=L.point(0,-innerHeight*.2);else if(isPhone()){const top=topBottom(),bot=innerHeight-snapH(sMode==="full"?"half":sMode)-TABH();off=L.point(0,(top+bot)/2-innerHeight/2)}else off=L.point(212,0);
   return map.unproject(map.project(ll,z).subtract(off),z)}
 function onFix(pos){const c=pos.coords;const n={lat:c.latitude,lng:c.longitude,acc:c.accuracy,spd:c.speed,hd:null,t:Date.now()};
   if(c.heading!=null&&!isNaN(c.heading)&&(c.speed||0)>1)n.hd=c.heading;
@@ -1718,7 +1719,7 @@ const sayDist=m=>m<950?"Через "+(Math.round(m/50)*50||50)+" метров":"
 async function startNav(){
   if(!me||Date.now()-me.t>15000){toast("Определяю, где вы…");try{await waitFix()}catch(e){toast("Не удалось определить местоположение. Включите геолокацию и попробуйте ещё раз.");return}}
   if(!me.bali){toast("Вы сейчас не на Бали — навигация работает только на острове");return}
-  nav={idx:0,off:0,lastRe:0,voice:store.get("bali-voice",true),said:new Set(),arrived:false};
+  nav={idx:0,off:0,lastRe:0,voice:store.get("bali-voice",true),said:new Set(),done:new Set(),arrived:false};
   if(curRoute&&curRoute.trip){if(curRoute.A.name!=="Моё местоположение")await computeTrip(curRoute.trip,{quiet:true,from:"me",stops:curRoute.remaining})}
   else if(rState.a!=="me"){rState.a="me";$("#rA").value=ptOf("me").name;await computeRoute({quiet:true})}
   if(!curRoute){nav=null;return}
@@ -1732,16 +1733,17 @@ function stopNav(){if(!nav)return;nav=null;try{wake&&wake.release()}catch(e){}wa
   if(curRoute)map.fitBounds(L.latLngBounds(curRoute.flat),padFor("half"));setSheet("half")}
 $("#nvStop").onclick=stopNav;
 $("#nbSnd").onclick=()=>{if(!nav)return;nav.voice=!nav.voice;store.set("bali-voice",nav.voice);$("#nbSnd").classList.toggle("off",!nav.voice);if(!nav.voice&&canSpeak())speechSynthesis.cancel();toast(nav.voice?"Голосовые подсказки включены":"Звук выключен")};
-$("#nvGm").onclick=()=>{if(!curRoute)return;const B=curRoute.B;window.open(`https://www.google.com/maps/dir/?api=1&destination=${B.lat},${B.lng}&travelmode=driving`,"_blank")};
+$("#nvGm").onclick=()=>{if(!curRoute)return;if(curRoute.gm){window.open(curRoute.gm,"_blank");return}const B=curRoute.B;window.open(`https://www.google.com/maps/dir/?api=1&destination=${B.lat},${B.lng}&travelmode=driving`,"_blank")};
 function snap(R,lat,lng,from){const kx=Math.cos(lat*rad)*111320,ky=110540;let best={d:Infinity,j:from,t:0};
   const lo=Math.max(0,from-40),hi=Math.min(R.flat.length-2,from+800);
   for(let j=lo;j<=hi;j++){const a=R.flat[j],b=R.flat[j+1];const ax=(a[1]-lng)*kx,ay=(a[0]-lat)*ky,bx=(b[1]-lng)*kx,by=(b[0]-lat)*ky;const dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy;
     let t=L2?-(ax*dx+ay*dy)/L2:0;t=Math.max(0,Math.min(1,t));const px=ax+t*dx,py=ay+t*dy,d=Math.hypot(px,py);if(d<best.d)best={d,j,t}}
   const a=R.flat[best.j],b=R.flat[best.j+1];best.along=R.cum[best.j]+best.t*(R.cum[best.j+1]-R.cum[best.j]);best.ll=[a[0]+(b[0]-a[0])*best.t,a[1]+(b[1]-a[1])*best.t];return best}
 async function navTick(){if(!nav||!curRoute||!me)return;const R=curRoute;
+  if(R.trip)R.mans.forEach(m=>{if(m.a==="finish"&&m.id!=null&&m.at&&hav(me.lat,me.lng,m.at[0],m.at[1])<120)nav.done.add(m.id)});
   const s=snap(R,me.lat,me.lng,nav.idx);
   if(s.d>Math.max(45,(me.acc||0)*1.2)){nav.off++;
-    if(nav.off>=2&&Date.now()-nav.lastRe>8000&&!nav.arrived){nav.lastRe=Date.now();nav.off=0;nav.idx=0;nav.said.clear();say("Перестраиваю маршрут");if(R.trip){const fin=R.mans.filter(m=>m.a==="finish");const left=R.remaining.filter((id,i)=>fin[i]&&fin[i].cum>(R.cum[nav.idx]||0));await computeTrip(R.trip,{quiet:true,from:"me",stops:left.length?left:R.remaining})}else{rState.a="me";await computeRoute({quiet:true})}if(nav)navTick();return}}
+    if(nav.off>=2&&Date.now()-nav.lastRe>8000&&!nav.arrived){nav.lastRe=Date.now();nav.off=0;const prog0=R.cum[nav.idx]||0;nav.idx=0;nav.said.clear();say("Перестраиваю маршрут");if(R.trip){const left=R.mans.filter(m=>m.a==="finish"&&m.id!=null&&m.cum>prog0+20&&!nav.done.has(m.id)).map(m=>m.id);await computeTrip(R.trip,{quiet:true,from:"me",stops:left.length?left:R.remaining})}else{rState.a="me";await computeRoute({quiet:true})}if(nav)navTick();return}}
   else{nav.off=0;nav.idx=s.j}
   const prog=s.d<=Math.max(45,(me.acc||0)*1.2)?s.along:R.cum[nav.idx];
   const total=R.cum[R.cum.length-1],rem=Math.max(0,total-prog);
@@ -1751,8 +1753,8 @@ async function navTick(){if(!nav||!curRoute||!me)return;const R=curRoute;
     $("#nbIc").innerHTML=arrowSVG("finish");$("#nbDist").textContent="Вы на месте";$("#nbText").textContent=R.B.name;$("#nbThen").textContent=""}
   else{$("#nbIc").innerHTML=arrowSVG(m.a);$("#nbDist").textContent=fmtDist(dist);$("#nbText").textContent=m.a==="finish"?(m.name&&m.text.startsWith("Остановка")?m.text:"Прибытие: "+R.B.name):m.text;
     const nx=R.mans[mi+1];$("#nbThen").textContent=nx&&nx.cum-m.cum<200?"Затем: "+(nx.a==="finish"?"вы на месте":nx.text.split(",")[0].toLowerCase()):"";
-    const key=mi+":";if(dist<260&&dist>90&&!nav.said.has(key+"far")){nav.said.add(key+"far");say(sayDist(dist)+" "+(m.a==="finish"?"вы на месте":m.text.toLowerCase()))}
-    if(dist<=45&&!nav.said.has(key+"now")){nav.said.add(key+"now");say(m.a==="finish"?"Вы на месте":m.text)}}
+    const key=mi+":";if(dist<260&&dist>90&&!nav.said.has(key+"far")){nav.said.add(key+"far");say(sayDist(dist)+" "+(m.a==="finish"?(m.text&&m.text.startsWith("Остановка")?m.text.toLowerCase():"вы на месте"):m.text.toLowerCase()))}
+    if(dist<=45&&!nav.said.has(key+"now")){nav.said.add(key+"now");say(m.a==="finish"?(m.text||"Вы на месте"):m.text)}}
   const left=R.secs*(rem/(total||1));const eta=new Date(Date.now()+left*1000);
   $("#nvTime").textContent=fmtDur(left);$("#nvInfo").textContent=fmtDist(rem)+" · прибытие "+eta.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
   if(follow){const z=Math.max(map.getZoom(),16);map.setView(viewCenter([me.lat,me.lng],z),z,{animate:true,duration:.6})}}
@@ -1767,10 +1769,10 @@ const hm=m=>String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStar
 const hoursCache=new Map();
 function parseHours(h){if(!h)return null;if(hoursCache.has(h))return hoursCache.get(h);let r=null;const s=h.toLowerCase();
   if(/круглосуточно/.test(s))r={all:true};
-  else if(!/заезд|выезд|сеанс|шоу|буфет|сауна|лучше всего|бассейн до/.test(s)){const rules=[];
+  else if(!/заезд|выезд|сеанс|шоу|буфет|сауна|лучше всего|бассейн до|выход|обед|пакет/.test(s)){const rules=[];
     for(const seg of s.split(/[;,]/)){const t=seg.match(/(\d{1,2})[:.](\d{2})\s*[–—-]\s*(\d{1,2})[:.](\d{2})/);
       const dm=seg.match(/(пн|вт|ср|чт|пт|сб|вс)\s*[–—-]\s*(пн|вт|ср|чт|пт|сб|вс)/);const one=!dm&&seg.match(/(?:^|\s)(пн|вт|ср|чт|пт|сб|вс)(?=\s|$)/);
-      let days=null;if(dm){days=[];let d=DOWN[dm[1]];for(let k=0;k<7;k++){days.push(d);if(d===DOWN[dm[2]])break;d=(d+1)%7}}else if(one)days=[DOWN[one[1]]];
+      let days=null;const andD=!dm&&seg.match(/(пн|вт|ср|чт|пт|сб|вс)\s+и\s+(пн|вт|ср|чт|пт|сб|вс)/);if(andD)days=[DOWN[andD[1]],DOWN[andD[2]]];else if(dm){days=[];let d=DOWN[dm[1]];for(let k=0;k<7;k++){days.push(d);if(d===DOWN[dm[2]])break;d=(d+1)%7}}else if(one)days=[DOWN[one[1]]];
       if(/выходной/.test(seg)){if(days)rules.push({days,closed:true});continue}
       if(!t||(/последний|процедуры|спа\s|заказ/.test(seg)&&rules.length))continue;
       let o=+t[1]*60+ +t[2],c=+t[3]*60+ +t[4];if(c===0)c=1440;rules.push({days,o,c})}
@@ -1811,7 +1813,8 @@ function switchTab(t){if(nav&&t!=="map")return;tab=t;document.querySelectorAll("
   if(t==="places")renderPlaces();if(t==="trips")renderTrips();if(t==="me")renderMe();if(t==="more")renderMore();
   if(t!=="map"){const pg=$(pages[t]);pg.querySelector(".pbody").scrollTop=0}else if(isPhone())applyH(snapH(sMode),false)}
 $("#tabbar").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b)switchTab(b.dataset.tab)});
-function goToPlace(id){switchTab("map");openPlace(id,true)}
+function closeRouting(){if(nav)return;if(!$("#vTrip").hidden||!$("#vRoute").hidden){curTrip=null;curRoute=null;routeLayer.clearLayers();rState.a=rState.b=null;showMarkers(true)}}
+function goToPlace(id){const fromPage=tab!=="map";switchTab("map");if(fromPage)closeRouting();openPlace(id,true)}
 function updateTripBadge(){const t=trips.find(x=>x.id===activeTrip);const n=t?t.stops.length:0;const b=$("#tripBadge");b.hidden=!n;b.textContent=n}
 
 /* ---------- reusable place card (photo) ---------- */
@@ -1869,7 +1872,7 @@ $("#pChips").addEventListener("click",e=>{const b=e.target.closest("[data-pf]");
   if(k==="near")pstate.sort=pstate.sort==="near"?"rating":"near";else pstate.f.has(k)?pstate.f.delete(k):pstate.f.add(k);renderPlaces()});
 $("#pq").addEventListener("input",e=>{pstate.q=e.target.value.trim().toLowerCase();renderPlaces()});
 // show a set of places on the map list (keeps other filters off)
-function showOnMap(title,ids){Object.assign(state,{q:"",cats:new Set(),region:"",price:"",favOnly:false,hideVisited:false});$("#q").value="";$("#region").value="";$("#price").value="";
+function showOnMap(title,ids){closeRouting();Object.assign(state,{q:"",cats:new Set(),region:"",price:"",favOnly:false,hideVisited:false});$("#q").value="";$("#region").value="";$("#price").value="";
   state.ids=new Set(ids);state.idsName=title;switchTab("map");showList();render(true);setSheet("half")}
 
 /* ---------- near carousel in the map sheet ---------- */
@@ -1885,7 +1888,7 @@ function addToTrip(id){let t=trips.find(x=>x.id===activeTrip);if(!t)t=newTrip();
   t.stops.push(id);saveTrips();toast(`Добавлено в «${t.name}» · мест: ${t.stops.length}`)}
 let tripView=null;
 function renderTrips(){const B=$("#tripsBody");
-  if(tripView){const t=trips.find(x=>x.id===tripView);if(!t){tripView=null;return renderTrips()}
+  if(tripView){const t=trips.find(x=>x.id===tripView);if(!t){tripView=null;return renderTrips()}t.stops=t.stops.filter(byId);
     const stops=t.stops.map(byId).filter(Boolean);let legKm=0;const pts=[t.start==="home"?HOME:null,...stops].filter(Boolean);for(let i=1;i<pts.length;i++)legKm+=hav(pts[i-1].lat,pts[i-1].lng,pts[i].lat,pts[i].lng)/1000;
     B.innerHTML=`<div class="dhead"><button class="sbtn" id="tBack" aria-label="К поездкам">${ICON.back}</button><input class="tname" id="tName" value="${esc(t.name)}" aria-label="Название поездки"></div>
       <div class="tstart"><span>Старт:</span><button class="pill" data-ts="home" aria-pressed="${t.start==="home"}">Дом</button><button class="pill" data-ts="me" aria-pressed="${t.start==="me"}">Где я сейчас</button></div>
@@ -1931,7 +1934,7 @@ async function shareLink(title,hash){const url=location.href.split("#")[0]+hash;
 
 /* multi-stop route on the map */
 let curTrip=null;
-async function computeTrip(t,o={}){const quiet=!!o.quiet;curTrip=t;routeLayer.clearLayers();showMarkers(false);showView("vTrip");if(!quiet)setSheet("half");
+async function computeTrip(t,o={}){const quiet=!!o.quiet;curTrip=t;curRoute=null;routeLayer.clearLayers();showMarkers(false);showView("vTrip");if(!quiet)setSheet("half");
   const box=$("#tres");$("#tTitle").textContent=t.name;
   let start=o.from||t.start;if(start==="me"&&(!me||!me.bali))start="home";
   const stops=(o.stops||t.stops).map(byId).filter(Boolean);if(!stops.length){box.innerHTML='<div class="warn">В поездке нет мест.</div>';return}
@@ -1939,23 +1942,23 @@ async function computeTrip(t,o={}){const quiet=!!o.quiet;curTrip=t;routeLayer.cl
   box.innerHTML=`<div class="steps"><div><span class="spin"></span> ${G?"Считаю маршрут…":"Загружаю дороги Бали (один раз, ~2,5 МБ)…"}</div></div>`;
   try{await loadGraph()}catch(e){box.innerHTML='<div class="warn">Не удалось загрузить дорожную сеть. Проверьте интернет.</div>';gLoading=null;return}
   await new Promise(r=>setTimeout(r,20));
-  const flat=[],cum=[],mans=[],legs=[];let secs=0,off=0,bad=[];
+  const flat=[],cum=[],mans=[],legs=[],segs=[];let secs=0,off=0,bad=[],lastOk=null;
   for(let i=1;i<pts.length;i++){const A=pts[i-1],B=pts[i];const na=nearest(A.lat,A.lng),nb=nearest(B.lat,B.lng);const res=na.i===nb.i?{secs:0,edges:[]}:dijkstra(na.i,nb.i);
     if(!res){bad.push(B.name);legs.push({to:B,secs:null,m:0});continue}
     const lf=[],ls=[];res.edges.forEach(e=>{ls.push(lf.length);edgeCoords(e).forEach(q=>lf.push(q))});if(!lf.length)lf.push([B.lat,B.lng],[B.lat,B.lng]);
     const ST=res.edges.length?buildSteps(lf,ls,res.edges):{cum:new Float64Array([0,0]),mans:[{cum:0,ll:lf[0],a:"finish"}]};
     const extra=(na.d+nb.d)*1.3;const lsecs=res.secs+extra/(15/3.6)+Math.min(res.edges.length,400)*2.5;secs+=lsecs;
     lf.forEach((q,k)=>{flat.push(q);cum.push(off+ST.cum[k])});
-    ST.mans.forEach(m=>mans.push({...m,cum:m.cum+off,...(m.a==="finish"?{name:B.name,text:i===pts.length-1?"Вы на месте":"Остановка: "+B.name}:{})}));
+    ST.mans.forEach(m=>mans.push({...m,cum:m.cum+off,...(m.a==="finish"?{name:B.name,id:B.id,at:[B.lat,B.lng],text:i===pts.length-1?"Вы на месте":"Остановка: "+B.name}:{})}));segs.push(lf);lastOk=B;
     const lm=ST.cum[ST.cum.length-1];legs.push({to:B,secs:lsecs,m:lm+extra});off+=lm}
   const meters=legs.reduce((s,l)=>s+l.m,0);
-  if(flat.length>1){L.polyline(flat,{color:"#ffffff",weight:10,opacity:.95,lineJoin:"round"}).addTo(routeLayer);L.polyline(flat,{color:"#2f6fde",weight:6,opacity:1,lineJoin:"round"}).addTo(routeLayer)}
+  segs.forEach(sg=>{if(sg.length<2)return;L.polyline(sg,{color:"#ffffff",weight:10,opacity:.95,lineJoin:"round"}).addTo(routeLayer);L.polyline(sg,{color:"#2f6fde",weight:6,opacity:1,lineJoin:"round"}).addTo(routeLayer)});
   L.circleMarker([pts[0].lat,pts[0].lng],{radius:7,color:"#fff",weight:3,fillColor:"#2f6fde",fillOpacity:1}).addTo(routeLayer);
   pts.slice(1).forEach((p,i)=>L.marker([p.lat,p.lng],{zIndexOffset:2500,icon:L.divIcon({className:"",html:`<div class="snum">${i+1}</div>`,iconSize:[26,26],iconAnchor:[13,13]})}).on("click",()=>openPlace(p.id,false)).addTo(routeLayer));
-  curRoute=flat.length>1?{flat,cum:Float64Array.from(cum),mans,secs,A:pts[0],B:pts[pts.length-1],trip:t,remaining:pts.slice(1).map(p=>p.id)}:null;
+  curRoute=flat.length>1&&lastOk?{flat,cum:Float64Array.from(cum),mans,secs,A:pts[0],B:lastOk,trip:t,remaining:pts.slice(1).map(p=>p.id)}:null;
   if(!quiet)map.fitBounds(L.latLngBounds(pts.map(p=>[p.lat,p.lng]).concat(flat.length?[flat[0]]:[])),padFor("half"));
   const wp=pts.slice(1,-1).map(p=>p.lat+","+p.lng).join("|");const last=pts[pts.length-1];
-  const gm=`https://www.google.com/maps/dir/?api=1&origin=${pts[0].lat},${pts[0].lng}&destination=${last.lat},${last.lng}${wp?"&waypoints="+encodeURIComponent(wp):""}&travelmode=driving`;
+  const gm=`https://www.google.com/maps/dir/?api=1&origin=${pts[0].lat},${pts[0].lng}&destination=${last.lat},${last.lng}${wp?"&waypoints="+encodeURIComponent(wp):""}&travelmode=driving`;if(curRoute)curRoute.gm=gm;
   box.innerHTML=`<div class="big"><strong>${fmtDur(secs)}</strong><span>${(meters/1000).toFixed(1).replace(".",",")} км на байке в дороге</span></div>
     <div class="steps"><div>Плюс время на сами места. ${bad.length?"":"Порядок можно поменять в разделе «Поездки»."}</div></div>
     ${bad.length?`<div class="warn">По дорогам не доехать до: ${bad.map(esc).join(", ")}. На Нуса-Пениду и Лембонган — фастбот из Санура.</div>`:""}
@@ -1969,7 +1972,7 @@ $("#tripEdit").onclick=()=>{if(curTrip){tripView=curTrip.id;switchTab("trips")}}
 const offlineOK=()=>"caches" in window&&!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 function tilesFor(flat){const set=new Set();const add=(z,lat,lng)=>{const n=2**z,x=Math.floor((lng+180)/360*n),s=Math.sin(lat*rad),y=Math.floor((.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n);
     for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)set.add(z+"/"+(y+dy)+"/"+(x+dx))};
-  for(const z of [12,13,14,15,16]){let last=null;for(const q of flat){if(last&&hav(last[0],last[1],q[0],q[1])<(z<15?600:250))continue;last=q;add(z,q[0],q[1])}}
+  for(const z of [12,13,14,15,16,17]){let last=null;for(const q of flat){if(last&&hav(last[0],last[1],q[0],q[1])<(z<15?600:z<17?250:120))continue;last=q;add(z,q[0],q[1])}}
   return [...set]}
 async function saveOffline(flat){const sat=store.get("bali-sat",false);const base=sat?ESRI+"World_Imagery/MapServer/tile/":"https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/";
   const T=tilesFor(flat);if(!confirm(`Сохранить карту вдоль маршрута для работы без интернета? Это ${T.length} фрагментов карты, примерно ${Math.round(T.length*18/1024)} МБ.`))return;
@@ -2003,10 +2006,10 @@ $("#setVoice").onclick=()=>{const v=!store.get("bali-voice",true);store.set("bal
 $("#offClear").onclick=async()=>{try{await caches.delete("bali-offline");await caches.delete("bali-tiles")}catch(e){}renderMore();toast("Сохранённые карты удалены")};
 
 /* ---------- deep links: #p123, #trip=… ---------- */
-function handleHash(){const h=decodeURIComponent(location.hash.slice(1));if(!h)return;
+function handleHash(){if(!location.hash)return;let h="";try{h=decodeURIComponent(location.hash.slice(1))}catch(e){}
   if(/^p\d+$/.test(h)&&byId(+h.slice(1))){goToPlace(+h.slice(1))}
   else if(h.startsWith("trip=")){try{const o=JSON.parse(h.slice(5));const ids=(o.s||[]).map(Number).filter(byId);if(ids.length){const t={id:Date.now(),name:String(o.n||"Поездка").slice(0,60),start:"home",stops:ids};
-      trips.unshift(t);activeTrip=t.id;saveTrips();tripView=t.id;switchTab("trips");toast("Поездка добавлена: "+t.name)}}catch(e){}}
+      trips.unshift(t);activeTrip=t.id;saveTrips();tripView=t.id;switchTab("trips");toast("Поездка добавлена: "+t.name)}}catch(e){toast("Ссылка на поездку повреждена")}}
   history.replaceState(null,"",location.pathname+location.search)}
 addEventListener("hashchange",handleHash);
 
