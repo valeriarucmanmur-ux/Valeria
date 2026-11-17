@@ -1,5 +1,5 @@
 // Offline support. Bump VERSION whenever index.html, vendor files or data change.
-const VERSION = "bali-2026-11-17-commons";
+const VERSION = "bali-2026-11-17-v2.0";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "vendor/leaflet.js", "vendor/leaflet.markercluster.js",
   "data/places.enc.json", "icons/icon-192.png", "icons/icon-512.png"];
 const TILES = "bali-tiles";   // map tiles you have viewed, kept across versions
@@ -38,6 +38,14 @@ async function trimCache(cache) {
   } finally { trimming = false; }
 }
 
+// show the cached copy at once, refresh it in the background (replaced photos reach installed phones)
+async function staleWhileRevalidate(req, name) {
+  const cache = await caches.open(name);
+  const hit = await cache.match(req);
+  const fresh = fetch(req).then(res => { if (res.ok) cache.put(req, res.clone()); return res; }).catch(() => null);
+  return hit || (await fresh) || Response.error();
+}
+
 async function networkFirst(req) {
   const cache = await caches.open(VERSION);
   try {
@@ -59,6 +67,6 @@ self.addEventListener("fetch", e => {
   if (url.hostname.endsWith("gstatic.com") || url.hostname.endsWith("googleapis.com")) return e.respondWith(cacheFirst(req, MEDIA));
   if (url.hostname.endsWith(".wikimedia.org")) return e.respondWith(cacheFirst(req, MEDIA));
   if (url.origin !== location.origin) return;
-  if (url.pathname.includes("/photos/") || url.pathname.endsWith("/data/roads.json")) return e.respondWith(cacheFirst(req, MEDIA));
+  if (url.pathname.includes("/photos/") || url.pathname.endsWith("/data/roads.json")) return e.respondWith(staleWhileRevalidate(req, MEDIA));
   e.respondWith(networkFirst(req));
 });

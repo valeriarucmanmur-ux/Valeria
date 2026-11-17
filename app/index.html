@@ -1187,6 +1187,34 @@ body.picking .top{visibility:hidden}
 .regs .reg{height:96px}
 @media (max-width:760px){.regs{grid-template-columns:1fr 1fr}.reg b{font-size:13.5px}.reg small{font-size:11px}}
 .pai{position:absolute;bottom:auto;top:8px;left:50%;transform:translateX(-50%);font-style:normal;font-size:10px;font-weight:800;letter-spacing:.04em;color:#fff;background:rgba(35,32,28,.62);border-radius:6px;padding:2px 6px}
+
+.hscroll{scroll-padding-inline:18px}
+.gdots{bottom:auto;top:20px}
+.credit{max-width:calc(100% - 20px)}
+.rsum{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);background:var(--paper)}
+.rsum b{font-size:19px;font-weight:800;color:var(--sage)}.rsum small{color:var(--muted);font-size:13px}
+.rsum .btn{height:42px}
+.sact .sbtn{width:40px;height:40px}
+.tstart .pill,.pill.fbtn{height:40px}
+.swap{width:42px;height:42px}
+.lockrem input{width:20px;height:20px}
+.pickban{max-width:calc(100% - 24px)}
+@media (max-width:760px){
+  .hscroll{scroll-padding-inline:16px}
+  .sheet[data-mode="half"] .hero{aspect-ratio:4/1}
+  #vRoute .mode{display:none}
+  .sheet:not([data-mode="full"]) #vRoute .rres .big,.sheet:not([data-mode="full"]) #vRoute .rmain{display:none}
+}
+@media (max-width:760px) and (max-height:720px){
+  #homeBtn,#fitBtn{display:none}
+  .sheet[data-mode="half"] .hero{aspect-ratio:6/1}
+  #vRoute .vtitle h1{font-size:16px}
+  .sheet[data-mode="half"] .cbody>div:first-child .badge,.sheet[data-mode="half"] .cbody>div:first-child .tag,.sheet[data-mode="half"] .cbody .crow{display:none}
+  .sheet[data-mode="half"] .cbody h2{margin-top:0!important;font-size:19px}
+  .sheet[data-mode="half"] .cbody{gap:10px;padding-top:10px}
+  .sheet[data-mode="half"] .credit,.sheet[data-mode="half"] .gdots{display:none}
+}
+@media (min-width:761px){.rsum{display:none!important}}
 </style>
 </head>
 <body>
@@ -1264,6 +1292,7 @@ body.picking .top{visibility:hidden}
       </div>
       <div class="mode"><b><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17" r="3.5"/><circle cx="18.5" cy="17" r="3.5"/><path d="M5.5 17 9 10h6l3.5 7M9 10 7.5 7H5M15 10l1.5-4H19"/></svg>Байк</b> по дорогам OpenStreetMap</div>
     </div>
+    <div class="rsum" id="rsum" hidden><span><b id="rsT"></b><small id="rsK"></small></span><button class="btn pri go" id="rsGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button></div>
     <div class="rres" id="rres"></div>
   </div>
 </div>
@@ -1458,12 +1487,13 @@ function visible(){return PLACES.filter(p=>{
   if(state.openNow&&!openInfo(p)?.open)return false;
   if(state.favOnly&&!favs.has(p.id))return false;
   if(state.hideVisited&&visited.has(p.id))return false;
-  if(state.q&&!qMatch(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" "),state.q))return false;
+  if(state.q&&!qMatch(p.name+" "+(p.kw||"")+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" "),state.q))return false;
   return true})}
 // Cyrillic queries also match Latin names: «улуват» → uluwat, «убуд» → ubud
 const TR={а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"e",ж:"j",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"h",ц:"ts",ч:"c",ш:"sh",щ:"sh",ъ:"",ы:"y",ь:"",э:"e",ю:"yu",я:"ya"};
-function qVariants(q){if(!/[а-яё]/.test(q))return [q];const a=[...q].map(c=>TR[c]??c).join("");return [q,a,a.replace(/v/g,"w"),a.replace(/c/g,"ch"),a.replace(/y/g,"i"),a.replace(/ya/g,"ia").replace(/yu/g,"iu")]}
-const qMatch=(text,q)=>{const t=text.toLowerCase();return qVariants(q).some(v=>t.includes(v))};
+function qVariants(q){if(!/[а-яё]/.test(q))return [q];const st=q.length>5?q.slice(0,-2):q.length>4?q.slice(0,-1):q;if(st!==q)return [...new Set([...trVariants(q),...trVariants(st)])];return trVariants(q)}
+function trVariants(q){const a=[...q].map(c=>TR[c]??c).join("");return [q,a,a.replace(/v/g,"w"),a.replace(/c/g,"ch"),a.replace(/y/g,"i"),a.replace(/ya/g,"ia").replace(/yu/g,"iu")]}
+const qMatch=(text,q)=>{const t=text.toLowerCase().replace(/ё/g,"е");q=q.replace(/ё/g,"е");return qVariants(q).some(v=>t.includes(v))};
 const fmtKm=k=>k<10?k.toFixed(1).replace(".",",")+" км":Math.round(k)+" км";
 function itemHTML(p){return `<button class="item ${state.sel===p.id?"on":""}" data-id="${p.id}">${p.thumb?`<img class="thumb" loading="lazy" src="${p.thumb}" alt="" data-cat="${esc(p.cat)}">`:`<span class="noimg" style="background:${col(p.cat)}">${svg(p.cat,26)}</span>`}<span style="min-width:0"><b>${esc(p.name)}${favs.has(p.id)?' <span style="color:#e0a100">★</span>':""}${visited.has(p.id)?' <span style="color:var(--faint)">✓</span>':""}</b><span class="sub"><i class="dot" style="background:${col(p.cat)}"></i><span>${esc(p.cat)} · ${esc(p.area)}</span></span><span class="info">${p.rating?`<span><span class="stars">★ ${String(p.rating).replace(".",",")}</span> (${p.reviews.toLocaleString("ru-RU")})</span>`:""}${p.level!==null&&p.level!==undefined?`<span class="tag">${PRICE_TXT[p.level]}</span>`:""}<span>${fmtKm(p.homeKm)} от дома</span>${p.isNew?'<span class="tag new">новое</span>':""}</span></span></button>`}
 function render(fit){
@@ -1476,7 +1506,7 @@ function render(fit){
   $("#count").textContent=state.ids?`«${state.idsName}» · ${v.length}`:`Показано ${v.length} из ${PLACES.length}`;$("#openNow").setAttribute("aria-pressed",state.openNow);
   cluster.clearLayers();cluster.addLayers(v.map(p=>markers[p.id]));
   let html="";
-  if(state.q){const nm=p=>qMatch(p.name,state.q)?0:1;html=[...v].sort((a,b)=>nm(a)-nm(b)||(DIDX[a.region]??99)-(DIDX[b.region]??99)).map(itemHTML).join("")}
+  if(state.q){const nm=p=>qMatch(p.name+" "+(p.kw||""),state.q)?0:1;html=[...v].sort((a,b)=>nm(a)-nm(b)||(DIDX[a.region]??99)-(DIDX[b.region]??99)).map(itemHTML).join("")}
   else if(state.sort==="region"){let cur="",cz=null;[...v].sort((a,b)=>(DIDX[a.region]??99)-(DIDX[b.region]??99)||a.name.localeCompare(b.name)).forEach(p=>{const z=DISTRICTS[DIDX[p.region]]?.zone;if(z&&z!==cz){cz=z;html+=`<div class="zone">${esc(z)}</div>`}if(p.region!==cur){cur=p.region;html+=`<div class="group">${esc(cur)}</div>`}html+=itemHTML(p)})}
   else{const s=[...v];if(state.sort==="near")s.sort((a,b)=>a.homeKm-b.homeKm);if(state.sort==="rating")s.sort((a,b)=>(b.rating||0)-(a.rating||0)||(b.reviews-a.reviews));if(state.sort==="new")s.sort((a,b)=>(b.isNew?1:0)-(a.isNew?1:0));html=s.map(itemHTML).join("")}
   $("#list").innerHTML=html||`<div class="empty">Ничего не нашлось. Попробуйте сбросить фильтры.</div>`;
@@ -1505,6 +1535,7 @@ const ICON={
  close:'<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.4" fill="none"><path d="M6 6l12 12M18 6 6 18"/></svg>'
 };
 let cardFrom=null;
+const credTxt=a=>/^(Иллюстрация|Для примера)/.test(a)?a:a==="из подборки"?"Фото из подборки":"Фото: "+a;
 function openPlace(id,fly){if($("#vCard").hidden)history.pushState({v2:"card"},"");if(!$("#vRoute").hidden)cardFrom="vRoute";else if(!$("#vTrip").hidden)cardFrom="vTrip";else if($("#vCard").hidden)cardFrom=null;
   const isHome=id==="home";const p=isHome?HOME:PLACES.find(x=>x.id===id);if(!p)return;
   const prev=state.sel;state.sel=id;
@@ -1530,11 +1561,11 @@ function openPlace(id,fly){if($("#vCard").hidden)history.pushState({v2:"card"},"
     const near=PLACES.filter(x=>x.id!==id).map(x=>[x,hav(p.lat,p.lng,x.lat,x.lng)]).filter(x=>x[1]<6000).sort((a,b)=>a[1]-b[1]).slice(0,6);
     c.innerHTML=`<div class="hero">${gal.length?`<div class="gal" id="gal">${gal.map((g,k)=>`<img src="${esc(g.u)}" alt="${esc(p.name)}" ${k?'loading="lazy"':""} data-cat="${esc(p.cat)}" data-big="1">`).join("")}</div>`:`<div class="noimg" style="background:${col(p.cat)}">${svg(p.cat,56)}</div>`}<button class="fab l" id="cBack" aria-label="К списку">${ICON.back}</button>
       <button class="fab r" id="cShare" aria-label="Поделиться"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7.5 7.5 12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
-      ${gal.length>1?`<span class="gdots" id="gdots">${gal.map((g,k)=>`<i class="${k?"":"on"}"></i>`).join("")}</span>`:""}${gal.length?`<span class="credit" id="gcred">Фото: ${esc(gal[0].a)}</span>`:""}</div>
+      ${gal.length>1?`<span class="gdots" id="gdots">${gal.map((g,k)=>`<i class="${k?"":"on"}"></i>`).join("")}</span>`:""}${gal.length?`<span class="credit" id="gcred">${esc(credTxt(gal[0].a))}</span>`:""}</div>
     <div class="cbody">
       <div><span class="badge" style="background:${col(p.cat)}"><i>${svg(p.cat,11)}</i>${esc(p.cat)}</span>${p.isNew?' <span class="tag new" style="font-size:12px">новое</span>':""}
         <h2 style="margin-top:10px">${esc(p.name)}</h2>
-        <div class="crow" style="margin-top:4px">${p.rating?`<span class="stars">★ ${String(p.rating).replace(".",",")}</span><span>(${p.reviews.toLocaleString("ru-RU")} отзывов)</span><span>·</span>`:""}<span>${esc(p.region)}${p.zone?" · "+esc(p.zone):""}</span></div></div>
+        <div class="crow" style="margin-top:4px">${p.rating?`<span class="stars">★ ${String(p.rating).replace(".",",")}</span><span>(${p.reviews.toLocaleString("ru-RU")} отзывов)</span><span>·</span>`:""}<span>${esc(p.region)}${p.zone&&p.zone!==p.region?" · "+esc(p.zone):""}</span></div></div>
       <div class="actions">
         <button class="act pri" id="cRoute"><span class="c">${ICON.route}</span>Маршрут</button>
         <a class="act" href="${p.gm}" target="_blank" rel="noopener"><span class="c">${ICON.gmap}</span>Google Maps</a>
@@ -1567,7 +1598,7 @@ function openPlace(id,fly){if($("#vCard").hidden)history.pushState({v2:"card"},"
     $("#cShare").onclick=()=>shareLink(p.name,"#p"+id);
     let nt;$("#cNote").oninput=e=>{clearTimeout(nt);nt=setTimeout(()=>{const v=e.target.value.trim();if(v)notes[id]=v;else delete notes[id];store.set("bali-notes",notes)},400)};
     c.querySelectorAll("[data-near2]").forEach(b=>b.onclick=()=>openPlace(+b.dataset.near2,true));
-    const G2=$("#gal");if(G2&&gal.length>1)G2.addEventListener("scroll",()=>{const k=Math.round(G2.scrollLeft/G2.clientWidth);document.querySelectorAll("#gdots i").forEach((d,j)=>d.classList.toggle("on",j===k));$("#gcred").textContent="Фото: "+(gal[k]||gal[0]).a},{passive:true});
+    const G2=$("#gal");if(G2&&gal.length>1)G2.addEventListener("scroll",()=>{const k=Math.round(G2.scrollLeft/G2.clientWidth);document.querySelectorAll("#gdots i").forEach((d,j)=>d.classList.toggle("on",j===k));$("#gcred").textContent=credTxt((gal[k]||gal[0]).a)},{passive:true});
     const it=document.querySelector(`.item[data-id="${id}"]`);if(it)it.classList.add("on");
   }
   $("#cBack").onclick=()=>{deselect();if(cardFrom){const v=cardFrom;cardFrom=null;showMarkers(false);showView(v);setSheet("half");return}showMarkers(true);showView("vList");setSheet("half")};
@@ -1617,7 +1648,7 @@ function startRoute(a,b,keepHome){if($("#vRoute").hidden)history.pushState({v2:"
 $("#routeBtn").onclick=()=>startRoute("home",state.sel!==null&&state.sel!=="home"?state.sel:null);
 $("#routeClose").onclick=()=>{stopNav();curRoute=null;routeLayer.clearLayers();showMarkers(true);rState.a=rState.b=null;deselect();showView("vList");setSheet("peek")};
 $("#swap").onclick=()=>{[rState.a,rState.b]=[rState.b,rState.a];$("#rA").value=rState.a!==null?ptOf(rState.a).name:"";$("#rB").value=rState.b!==null?ptOf(rState.b).name:"";computeRoute()};
-function setupSugg(inp,box,key){let k=-1;const opts=()=>{const q=inp.value.trim().toLowerCase();const all=(me&&me.bali?[{id:"me",name:"Моё местоположение",cat:null,me:1}]:[]).concat([{id:"home",name:"Дом",cat:null}]).concat(PLACES.map(p=>({id:p.id,name:p.name,cat:p.cat,area:p.area})));return all.filter(o=>!q||qMatch(o.name+" "+(o.area||""),q)).slice(0,30)};
+function setupSugg(inp,box,key){let k=-1;const opts=()=>{const q=inp.value.trim().toLowerCase();const all=(me&&me.bali?[{id:"me",name:"Моё местоположение",cat:null,me:1}]:[]).concat([{id:"home",name:"Дом",cat:null}]).concat(PLACES.map(p=>({id:p.id,name:p.name,cat:p.cat,area:p.area,kw:p.kw||""})));if(!q)return all.slice(0,30);const nm=all.filter(o=>qMatch(o.name+" "+(o.kw||""),q));return nm.concat(all.filter(o=>!nm.includes(o)&&qMatch(o.area||"",q))).slice(0,30)};
   const draw=()=>{const o=opts();box.innerHTML=o.map((x,i)=>`<button data-k="${x.id}" class="${i===k?"k":""}"><i style="background:${x.cat?col(x.cat):x.me?"#2f6fde":"#23201c"}"></i>${esc(x.name)}</button>`).join("")||'<div class="empty" style="padding:12px">Нет совпадений</div>';box.hidden=false};
   inp.addEventListener("focus",()=>{k=-1;inp.select();draw();setSheet("full")});inp.addEventListener("input",()=>{k=-1;draw()});
   inp.addEventListener("keydown",e=>{const o=opts();if(e.key==="ArrowDown"){k=Math.min(k+1,o.length-1);draw();e.preventDefault()}else if(e.key==="ArrowUp"){k=Math.max(k-1,0);draw();e.preventDefault()}else if(e.key==="Enter"&&o.length){choose(o[Math.max(k,0)].id)}else if(e.key==="Escape"){box.hidden=true}});
@@ -1627,7 +1658,7 @@ function setupSugg(inp,box,key){let k=-1;const opts=()=>{const q=inp.value.trim(
 setupSugg($("#rA"),$("#sA"),"a");setupSugg($("#rB"),$("#sB"),"b");
 const fmtDur=s=>{const m=Math.round(s/60);if(m<60)return m+" мин";const h=Math.floor(m/60),mm=m%60;return h+" ч"+(mm?" "+mm+" мин":"")};
 let curRoute=null;
-async function computeRoute(o={}){const quiet=!!o.quiet;
+async function computeRoute(o={}){const quiet=!!o.quiet;$("#rsum").hidden=true;
   routeLayer.clearLayers();curRoute=null;const box=$("#rres");showMarkers(rState.a===null||rState.b===null);
   if(rState.a===null||rState.b===null){box.innerHTML=`<div class="steps"><div>Выберите две точки — любые места с карты или дом. Можно начать прямо с карточки места кнопкой «Маршрут».</div></div>`;return}
   if(rState.a===rState.b){box.innerHTML=`<div class="warn">Начало и конец маршрута совпадают.</div>`;return}
@@ -1660,14 +1691,14 @@ async function computeRoute(o={}){const quiet=!!o.quiet;
   const leg=byClass.map((v,i)=>v/tot>.03?`<span><i style="background:${CLASSC[i]}"></i>${CLASSN[i]} ${Math.round(v/tot*100)}%</span>`:"").join("");
   const lo=secs*0.9,hi=secs*1.35;
   box.innerHTML=`<div class="big"><strong>${fmtDur(secs)}</strong><span>${(meters/1000).toFixed(1).replace(".",",")} км на байке</span></div>
-   <div class="row"><button class="btn pri go" id="rGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button><a class="btn" href="${gmUrl}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${rState.b!=="me"?`<button class="btn" id="rBack">${ICON.back}К месту</button>`:""}${offlineOK()?`<button class="btn" id="rOff">Сохранить карту офлайн</button>`:""}</div>
+   <div class="row rmain"><button class="btn pri go" id="rGo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Поехали</button><a class="btn" href="${gmUrl}" target="_blank" rel="noopener">${ICON.gmap}Google Maps</a>${rState.b!=="me"?`<button class="btn" id="rBack">${ICON.back}К месту</button>`:""}${offlineOK()?`<button class="btn" id="rOff">Сохранить карту офлайн</button>`:""}</div>
    <div class="steps"><div>Обычно ${fmtDur(lo)} – ${fmtDur(hi)}: в Чангу, Убуде и на Буките в часы пик дорога дольше.</div></div>
    <div class="bar">${bars}</div><div class="legend2">${leg}</div>
    ${(walkA>300||walkB>300)?`<div class="warn">${walkA>300?`Начальная точка в ${Math.round(walkA)} м от ближайшей дороги на карте. `:""}${walkB>300?`Последние ${Math.round(walkB)} м до места — пешком или по тропе.`:""}</div>`:""}
    <details class="tbt"><summary>Пошагово · ${ST.mans.length-1} ${plural(ST.mans.length-1,"поворот","поворота","поворотов")}</summary><ol>${ST.mans.map((m,i)=>`<li><button data-m="${i}"><span class="ti">${arrowSVG(m.a)}</span><span><b>${esc(m.a==="finish"?"Прибытие: "+B.name:m.text)}</b><small>${fmtDist(m.cum)} от старта</small></span></button></li>`).join("")}</ol></details>
    <div class="steps"><div>Скорость для байка: трасса 45–55 км/ч, главные дороги 40, местные 25–30, улочки 20. Пробки, дождь и паромы не учитываются.</div></div>`;
   if($("#rBack"))$("#rBack").onclick=()=>{const id=rState.b;if(id!==null&&id!=="me"){showMarkers(true);openPlace(id,false)}};
-  $("#rGo").onclick=startNav;if($("#rOff"))$("#rOff").onclick=()=>saveOffline(flat);
+  $("#rGo").onclick=startNav;$("#rsT").textContent=fmtDur(secs);$("#rsK").textContent=" · "+(meters/1000).toFixed(1).replace(".",",")+" км";$("#rsum").hidden=false;$("#rsGo").onclick=startNav;if($("#rOff"))$("#rOff").onclick=()=>saveOffline(flat);
   box.querySelector(".tbt ol").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b||!curRoute)return;const m=curRoute.mans[+b.dataset.m];if(isPhone())setSheet("half");flyCenter(m.ll,17,"half")});
 }
 
@@ -1805,10 +1836,12 @@ const hm=m=>String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStar
 const hoursCache=new Map();
 function parseHours(h){if(!h)return null;if(hoursCache.has(h))return hoursCache.get(h);let r=null;const s=h.toLowerCase();
   if(/круглосуточно/.test(s))r={all:true};
-  else if(!/заезд|выезд|сеанс|шоу|буфет|сауна|лучше всего|бассейн до|выход|обед|пакет/.test(s)){const rules=[];
-    for(const seg of s.split(/[;,]/)){const t=seg.match(/(\d{1,2})[:.](\d{2})\s*[–—-]\s*(\d{1,2})[:.](\d{2})/);
+  else if(!/заезд|выезд|сеанс|шоу|буфет|сауна|лучше всего|бассейн до|выход|обед|пакет/.test(s)){const rules=[];let carry=[];
+    for(let seg of s.replace(/\([^)]*\)/g,"").split(/[;,]/)){const t=seg.match(/(\d{1,2})[:.](\d{2})\s*[–—-]\s*(\d{1,2})[:.](\d{2})/);
       const dm=seg.match(/(пн|вт|ср|чт|пт|сб|вс)\s*[–—-]\s*(пн|вт|ср|чт|пт|сб|вс)/);const one=!dm&&seg.match(/(?:^|\s)(пн|вт|ср|чт|пт|сб|вс)(?=\s|$)/);
       let days=null;const andD=!dm&&seg.match(/(пн|вт|ср|чт|пт|сб|вс)\s+и\s+(пн|вт|ср|чт|пт|сб|вс)/);if(andD)days=[DOWN[andD[1]],DOWN[andD[2]]];else if(dm){days=[];let d=DOWN[dm[1]];for(let k=0;k<7;k++){days.push(d);if(d===DOWN[dm[2]])break;d=(d+1)%7}}else if(one)days=[DOWN[one[1]]];
+      if(!t&&!/выходной/.test(seg)&&days){carry=carry.concat(days);continue}
+      if(carry.length){days=(days||[]).concat(carry);carry=[]}
       if(/выходной/.test(seg)){if(days)rules.push({days,closed:true});continue}
       if(!t||(/последний|процедуры|спа\s|заказ/.test(seg)&&rules.length))continue;
       let o=+t[1]*60+ +t[2],c=+t[3]*60+ +t[4];if(c===0)c=1440;rules.push({days,o,c})}
@@ -1856,7 +1889,7 @@ function updateTripBadge(){const t=trips.find(x=>x.id===activeTrip);const n=t?t.
 
 /* ---------- reusable place card (photo) ---------- */
 function pcard(p,o={}){const km=kmFromMe(p),oi=openInfo(p);
-  return `<button class="pc ${o.wide?"wide":""}" data-go="${p.id}">${p.img?`<img loading="lazy" src="${p.thumb&&o.small?p.thumb:p.img}" alt="" data-cat="${esc(p.cat)}">`:`<span class="noimg" style="background:${col(p.cat)}">${svg(p.cat,30)}</span>`}
+  return `<button class="pc ${o.wide?"wide":""}" data-go="${p.id}">${p.img?`<img loading="lazy" src="${p.thumb||p.img}" alt="" data-cat="${esc(p.cat)}">`:`<span class="noimg" style="background:${col(p.cat)}">${svg(p.cat,30)}</span>`}
    ${p.imgBy&&/ИИ/.test(p.imgBy)?'<i class="pai" title="Иллюстрация, создана ИИ">ИИ</i>':""}   ${favs.has(p.id)?'<i class="pfav">★</i>':""}${visited.has(p.id)?'<i class="pvis">✓</i>':""}
    <span class="pct"><b>${esc(p.name)}</b><span class="pcs"><i style="background:${col(p.cat)}"></i>${esc(p.cat)}${p.rating?` · <em>★ ${String(p.rating).replace(".",",")}</em>`:""}</span>
    <span class="pcs">${km!=null?fmtKm(km)+" от вас":fmtKm(p.homeKm)+" от дома"}${oi?` · <span class="${oi.open?"ok":"no"}">${oi.open?"открыто":"закрыто"}</span>`:""}</span></span></button>`}
@@ -1877,7 +1910,7 @@ function collections(){const C=[];
   C.forEach(c=>{if(!c.keepOrder)c.ps=[...c.ps].sort(byLook)});return C}
 const pstate={q:"",f:new Set(),view:null,sort:"rating"};
 function pfilter(ps){return ps.filter(p=>{
-  if(pstate.q&&!qMatch(p.name+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" "),pstate.q))return false;
+  if(pstate.q&&!qMatch(p.name+" "+(p.kw||"")+" "+p.desc+" "+p.region+" "+p.area+" "+p.cat+" "+(p.tags||[]).join(" "),pstate.q))return false;
   if(pstate.f.has("open")&&!openInfo(p)?.open)return false;if(pstate.f.has("free")&&p.level!==0)return false;
   if(pstate.f.has("new")&&visited.has(p.id))return false;if(pstate.f.has("fav")&&!favs.has(p.id))return false;return true})}
 function psort(ps){const s=[...ps];if(pstate.sort==="near")s.sort((a,b)=>(kmFromMe(a)??a.homeKm)-(kmFromMe(b)??b.homeKm));else if(pstate.sort==="rating")s.sort(byRating);return s}
@@ -1909,7 +1942,7 @@ function renderPlaces(){const B=$("#placesBody");
     pstate.dscroll=0;renderPlaces();history.pushState({v2:"drill"},"")})}
 $("#pChips").addEventListener("click",e=>{const b=e.target.closest("[data-pf]");if(!b)return;const k=b.dataset.pf;
   if(k==="near")pstate.sort=pstate.sort==="near"?"rating":"near";else pstate.f.has(k)?pstate.f.delete(k):pstate.f.add(k);renderPlaces()});
-$("#pq").addEventListener("input",e=>{pstate.q=e.target.value.trim().toLowerCase();renderPlaces()});
+$("#pq").addEventListener("input",e=>{pstate.q=e.target.value.trim().toLowerCase();if(pstate.q)pstate.view=null;renderPlaces()});
 // show a set of places on the map list (keeps other filters off)
 function showOnMap(title,ids){closeRouting();Object.assign(state,{q:"",cats:new Set(),region:"",price:"",favOnly:false,hideVisited:false});$("#q").value="";$("#region").value="";$("#price").value="";
   state.ids=new Set(ids);state.idsName=title;switchTab("map");showList();render(true);setSheet("half")}
@@ -1948,7 +1981,7 @@ function renderTrips(){const B=$("#tripsBody");
     B.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{t.stops.splice(+b.dataset.rm,1);save()});
     B.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{t.stops.push(+b.dataset.add);activeTrip=t.id;save()});
     const tq=$("#tq"),ts=$("#tsugg");tq.oninput=()=>{const q=tq.value.trim().toLowerCase();if(!q){ts.innerHTML="";return}
-      ts.innerHTML=PLACES.filter(p=>!t.stops.includes(p.id)&&qMatch(p.name+" "+p.area+" "+p.cat+" "+p.region,q)).slice(0,8).map(p=>`<button data-add2="${p.id}"><i style="background:${col(p.cat)}"></i>${esc(p.name)}<small>${esc(p.area)}</small></button>`).join("")||'<div class="empty" style="padding:10px">Не нашлось</div>'};
+      ts.innerHTML=PLACES.filter(p=>!t.stops.includes(p.id)&&qMatch(p.name+" "+(p.kw||"")+" "+p.area+" "+p.cat+" "+p.region,q)).sort((a,b)=>(qMatch(a.name+" "+(a.kw||""),q)?0:1)-(qMatch(b.name+" "+(b.kw||""),q)?0:1)).slice(0,8).map(p=>`<button data-add2="${p.id}"><i style="background:${col(p.cat)}"></i>${esc(p.name)}<small>${esc(p.area)}</small></button>`).join("")||'<div class="empty" style="padding:10px">Не нашлось</div>'};
     ts.onclick=e=>{const b=e.target.closest("[data-add2]");if(b){t.stops.push(+b.dataset.add2);activeTrip=t.id;save();setTimeout(()=>$("#tq")&&$("#tq").focus(),0)}};
     if($("#tOpt"))$("#tOpt").onclick=()=>{optimizeTrip(t);save();toast("Порядок остановок пересчитан по расстоянию")};
     if($("#tMap"))$("#tMap").onclick=()=>{activeTrip=t.id;saveTrips();switchTab("map");computeTrip(t)};
@@ -1959,7 +1992,7 @@ function renderTrips(){const B=$("#tripsBody");
     <button class="btn pri wide" id="tNew">+ Новая поездка</button>
     <div class="tlist">${trips.map(t=>{const ps=t.stops.map(byId).filter(Boolean);return `<button class="trip" data-trip="${t.id}"><span class="tcov">${ps.slice(0,3).map(p=>p.thumb?`<img src="${p.thumb}" alt="">`:`<span class="noimg" style="background:${col(p.cat)}"></span>`).join("")}</span>
       <span><b>${esc(t.name)}</b><small>${ps.length} ${plural(ps.length,"место","места","мест")}${t.id===activeTrip?" · текущая":""}</small><small class="tnames">${ps.map(p=>esc(p.name)).join(" → ")}</small></span></button>`}).join("")||'<div class="empty">Пока нет поездок.</div>'}</div>`;
-  $("#tNew").onclick=()=>{tripView=newTrip().id;renderTrips()};
+  $("#tNew").onclick=()=>{history.pushState({v2:"trip"},"");tripView=newTrip().id;renderTrips()};
   B.querySelectorAll("[data-trip]").forEach(b=>b.onclick=()=>{history.pushState({v2:"trip"},"");tripView=+b.dataset.trip;activeTrip=tripView;saveTrips();renderTrips()})}
 // nearest-neighbour + 2-opt on straight-line distances, start fixed
 function optimizeTrip(t){const S=t.start==="me"&&me?me:HOME;const P=t.stops.map(byId).filter(Boolean);if(P.length<3)return;
