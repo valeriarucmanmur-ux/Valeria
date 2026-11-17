@@ -31,6 +31,7 @@ for (const p of data.places) {
   if (names.has(key)) warnings.push(`${tag}: same name as #${names.get(key)} — possible duplicate`);
   names.set(key, p.id);
   for (const f of ["name", "region", "cat", "desc", "area", "gm", "src"]) if (!p[f]) errors.push(`${tag}: empty "${f}"`);
+  if (data.districts && !data.districts.some(d => d.name === p.region)) errors.push(`${tag}: region "${p.region}" is not in districts[]`);
   if (!CATS.includes(p.cat)) errors.push(`${tag}: unknown category "${p.cat}"`);
   if (!(p.lat > -8.95 && p.lat < -8.0 && p.lng > 114.4 && p.lng < 115.75)) errors.push(`${tag}: coordinates outside Bali (${p.lat}, ${p.lng})`);
   for (const s of p.src.split("+").map(s => s.trim())) if (!SRC.includes(s)) errors.push(`${tag}: unknown source "${s}"`);

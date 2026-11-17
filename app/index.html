@@ -1182,6 +1182,10 @@ body.picking .top{visibility:hidden}
 }
 .hello{position:absolute;z-index:1002;left:50%;transform:translateX(-50%);top:calc(70px + env(safe-area-inset-top,0px));width:min(440px,calc(100% - 24px));background:var(--paper);border-radius:18px;box-shadow:var(--shadow-lg);padding:16px;display:flex;flex-direction:column;gap:8px}
 .hello span{color:var(--muted);font-size:13.5px}
+.zone{font-size:13px;font-weight:800;color:var(--ink);padding:18px 8px 0;letter-spacing:-.01em}
+.zh{margin:14px 0 8px;font-size:14px;font-weight:800;color:var(--muted)}
+.regs .reg{height:96px}
+@media (max-width:760px){.regs{grid-template-columns:1fr 1fr}.reg b{font-size:13.5px}.reg small{font-size:11px}}
 </style>
 </head>
 <body>
@@ -1405,8 +1409,11 @@ $("#homeBtn").onclick=()=>{openPlace("home",false);flyCenter([HOME.lat,HOME.lng]
 const catCount={};PLACES.forEach(p=>catCount[p.cat]=(catCount[p.cat]||0)+1);
 $("#cats").innerHTML=`<button class="chip plain" data-all="1" aria-pressed="true">Все</button>`+ALLC.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="false"><i style="background:${col(c)}">${svg(c,12)}</i>${c}</button>`).join("");
 $("#legend").innerHTML=ALLC.map(c=>`<div><i style="background:${col(c)}">${svg(c,11)}</i>${c} · ${catCount[c]}</div>`).join("")+`<div><i style="background:#23201c"><svg viewBox="0 0 24 24" width="11" height="11"><path d="M4 11 12 4l8 7v9H4z" fill="#fff"/></svg></i>Наш дом</div>`;
-const regions=[...new Set(PLACES.map(p=>p.region))];
-$("#region").insertAdjacentHTML("beforeend",regions.map(r=>`<option>${esc(r)}</option>`).join(""));
+// districts: one place name each (Чангу, Сесех, Табанан…), grouped into parts of the island (zones)
+const DISTRICTS=(DATA.districts||[...new Set(PLACES.map(p=>p.region))].map(n=>({name:n,zone:""}))).filter(d=>PLACES.some(p=>p.region===d.name));
+const DIDX=Object.fromEntries(DISTRICTS.map((d,i)=>[d.name,i])),ZONES=[...new Set(DISTRICTS.map(d=>d.zone))];
+const regions=DISTRICTS.map(d=>d.name);
+$("#region").insertAdjacentHTML("beforeend",ZONES.map(z=>`<optgroup label="${esc(z||"Районы")}">${DISTRICTS.filter(d=>d.zone===z).map(d=>`<option>${esc(d.name)}</option>`).join("")}</optgroup>`).join(""));
 $("#costs").innerHTML=COSTS.map(c=>`<li>${esc(c)}</li>`).join("");
 $("#total").textContent=PLACES.length;
 $("#cats").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.ids=null;if(b.dataset.all)state.cats.clear();else{const c=b.dataset.cat;state.cats.has(c)?state.cats.delete(c):state.cats.add(c)}render();showList()});
@@ -1468,7 +1475,7 @@ function render(fit){
   $("#count").textContent=state.ids?`«${state.idsName}» · ${v.length}`:`Показано ${v.length} из ${PLACES.length}`;$("#openNow").setAttribute("aria-pressed",state.openNow);
   cluster.clearLayers();cluster.addLayers(v.map(p=>markers[p.id]));
   let html="";
-  if(state.sort==="region"){let cur="";v.forEach(p=>{if(p.region!==cur){cur=p.region;html+=`<div class="group">${esc(cur)}</div>`}html+=itemHTML(p)})}
+  if(state.sort==="region"){let cur="",cz=null;[...v].sort((a,b)=>(DIDX[a.region]??99)-(DIDX[b.region]??99)||a.name.localeCompare(b.name)).forEach(p=>{const z=DISTRICTS[DIDX[p.region]]?.zone;if(z&&z!==cz){cz=z;html+=`<div class="zone">${esc(z)}</div>`}if(p.region!==cur){cur=p.region;html+=`<div class="group">${esc(cur)}</div>`}html+=itemHTML(p)})}
   else{const s=[...v];if(state.sort==="near")s.sort((a,b)=>a.homeKm-b.homeKm);if(state.sort==="rating")s.sort((a,b)=>(b.rating||0)-(a.rating||0)||(b.reviews-a.reviews));if(state.sort==="new")s.sort((a,b)=>(b.isNew?1:0)-(a.isNew?1:0));html=s.map(itemHTML).join("")}
   $("#list").innerHTML=html||`<div class="empty">Ничего не нашлось. Попробуйте сбросить фильтры.</div>`;
   if(fit&&v.length)map.flyToBounds(L.latLngBounds(v.map(p=>[p.lat,p.lng])).pad(.2),Object.assign({duration:.6,maxZoom:13},isPhone()?padFor(sMode==="peek"?"peek":"half"):{paddingTopLeft:[420,60]}));
@@ -1525,7 +1532,7 @@ function openPlace(id,fly){if($("#vCard").hidden)history.pushState({v2:"card"},"
     <div class="cbody">
       <div><span class="badge" style="background:${col(p.cat)}"><i>${svg(p.cat,11)}</i>${esc(p.cat)}</span>${p.isNew?' <span class="tag new" style="font-size:12px">новое</span>':""}
         <h2 style="margin-top:10px">${esc(p.name)}</h2>
-        <div class="crow" style="margin-top:4px">${p.rating?`<span class="stars">★ ${String(p.rating).replace(".",",")}</span><span>(${p.reviews.toLocaleString("ru-RU")} отзывов)</span><span>·</span>`:""}<span>${esc(p.region)}</span></div></div>
+        <div class="crow" style="margin-top:4px">${p.rating?`<span class="stars">★ ${String(p.rating).replace(".",",")}</span><span>(${p.reviews.toLocaleString("ru-RU")} отзывов)</span><span>·</span>`:""}<span>${esc(p.region)}${p.zone?" · "+esc(p.zone):""}</span></div></div>
       <div class="actions">
         <button class="act pri" id="cRoute"><span class="c">${ICON.route}</span>Маршрут</button>
         <a class="act" href="${p.gm}" target="_blank" rel="noopener"><span class="c">${ICON.gmap}</span>Google Maps</a>
@@ -1885,12 +1892,13 @@ function renderPlaces(){const B=$("#placesBody");
     if($("#pOnMap"))$("#pOnMap").onclick=()=>{showOnMap(v.t,ps.map(p=>p.id))};return}
   const C=collections();
   const cats=ALLC.map(c=>`<button class="catb" data-pv="cat:${esc(c)}"><i style="background:${col(c)}">${svg(c,20)}</i><span>${esc(c)}</span><small>${catCount[c]}</small></button>`).join("");
-  const regs=regions.map(r=>{const ps=PLACES.filter(p=>p.region===r);const cover=[...ps].filter(p=>p.img).sort(byLook)[0];const km=Math.min(...ps.map(p=>p.homeKm));
-    return `<button class="reg" data-pv="reg:${esc(r)}">${cover?`<img loading="lazy" src="${cover.img}" alt="">`:""}<span><b>${esc(r)}</b><small>${ps.length} ${plural(ps.length,"место","места","мест")} · от ${fmtKm(km)} от дома</small></span></button>`}).join("");
+  const regTile=r=>{const ps=PLACES.filter(p=>p.region===r);const cover=[...ps].filter(p=>p.img).sort(byLook)[0];const km=Math.min(...ps.map(p=>p.homeKm));
+    return `<button class="reg" data-pv="reg:${esc(r)}">${cover?`<img loading="lazy" src="${cover.thumb||cover.img}" alt="">`:""}<span><b>${esc(r)}</b><small>${ps.length} ${plural(ps.length,"место","места","мест")} · от ${fmtKm(km)} от дома</small></span></button>`};
+  const regs=ZONES.map(z=>`<h3 class="zh">${esc(z)}</h3><div class="regs">${DISTRICTS.filter(d=>d.zone===z).map(d=>regTile(d.name)).join("")}</div>`).join("");
   B.innerHTML=C.map((c,i)=>`<section class="coll"><div class="chd"><h2>${esc(c.t)}</h2><button class="link" data-pv="col:${i}">Все ${c.ps.length}</button></div>
      <div class="hscroll">${c.ps.slice(0,10).map(p=>pcard(p,{small:0})).join("")}</div></section>`).join("")+
     `<section class="coll"><div class="chd"><h2>Категории</h2></div><div class="cats">${cats}</div></section>
-     <section class="coll"><div class="chd"><h2>Районы</h2></div><div class="regs">${regs}</div></section>`;
+     <section class="coll"><div class="chd"><h2>Районы</h2></div>${regs}</section>`;
   if(pstate.back!=null){B.scrollTop=pstate.back;pstate.back=null}
   B.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{pstate.back=B.scrollTop;const [k,v]=b.dataset.pv.split(/:(.*)/s);
     if(k==="cat")pstate.view={t:v,ps:PLACES.filter(p=>p.cat===v)};
