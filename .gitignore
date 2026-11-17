@@ -3,3 +3,4 @@ node_modules/
 *.log
 *.apk
 app/data/places.json
+*.ipa
