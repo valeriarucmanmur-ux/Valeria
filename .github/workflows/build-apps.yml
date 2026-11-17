@@ -46,6 +46,8 @@ jobs:
   ios:
     name: iOS (неподписанный IPA)
     runs-on: macos-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -77,3 +79,10 @@ jobs:
         with:
           name: bali-ios-unsigned-ipa
           path: bali-bez-tolp-unsigned.ipa
+      - name: Положить IPA в ветку builds-ios
+        run: |
+          mkdir -p "$RUNNER_TEMP/outi" && cp bali-bez-tolp-unsigned.ipa "$RUNNER_TEMP/outi/"
+          cd "$RUNNER_TEMP/outi"
+          git init -q -b builds-ios && git add -A
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -qm "iOS ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" builds-ios
