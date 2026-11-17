@@ -26,6 +26,8 @@ jobs:
       - name: Скачать фото мест
         run: npm run photos || echo "Часть фото не скачалась — в приложении будет значок категории"
       - run: npm run check
+      - name: Уменьшить фото для телефона (лимит GitHub 100 МБ на файл)
+        run: pip install -q pillow && python3 tools/optimize-photos.py --max 1200 --q 76
       - run: npx cap sync android
       - name: Собрать APK
         working-directory: android
@@ -37,7 +39,7 @@ jobs:
           path: bali-bez-tolp.apk
       - name: Положить APK и фото в ветку builds
         run: |
-          mkdir -p "$RUNNER_TEMP/out" && cp bali-bez-tolp.apk "$RUNNER_TEMP/out/" && cp -R app/photos "$RUNNER_TEMP/out/photos"
+          mkdir -p "$RUNNER_TEMP/out" && cp bali-bez-tolp.apk "$RUNNER_TEMP/out/"
           cd "$RUNNER_TEMP/out"
           git init -q -b builds && git add -A
           git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -qm "Сборка ${GITHUB_SHA::7}"
@@ -62,6 +64,8 @@ jobs:
       - run: npm ci
       - name: Скачать фото мест
         run: npm run photos || echo "Часть фото не скачалась — в приложении будет значок категории"
+      - name: Уменьшить фото для телефона (лимит GitHub 100 МБ на файл)
+        run: pip install -q pillow && python3 tools/optimize-photos.py --max 1200 --q 76
       - run: npx cap sync ios
       - name: Собрать архив без подписи
         run: |
