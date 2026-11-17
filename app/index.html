@@ -1476,7 +1476,8 @@ function render(fit){
   $("#count").textContent=state.ids?`«${state.idsName}» · ${v.length}`:`Показано ${v.length} из ${PLACES.length}`;$("#openNow").setAttribute("aria-pressed",state.openNow);
   cluster.clearLayers();cluster.addLayers(v.map(p=>markers[p.id]));
   let html="";
-  if(state.sort==="region"){let cur="",cz=null;[...v].sort((a,b)=>(DIDX[a.region]??99)-(DIDX[b.region]??99)||a.name.localeCompare(b.name)).forEach(p=>{const z=DISTRICTS[DIDX[p.region]]?.zone;if(z&&z!==cz){cz=z;html+=`<div class="zone">${esc(z)}</div>`}if(p.region!==cur){cur=p.region;html+=`<div class="group">${esc(cur)}</div>`}html+=itemHTML(p)})}
+  if(state.q){const nm=p=>qMatch(p.name,state.q)?0:1;html=[...v].sort((a,b)=>nm(a)-nm(b)||(DIDX[a.region]??99)-(DIDX[b.region]??99)).map(itemHTML).join("")}
+  else if(state.sort==="region"){let cur="",cz=null;[...v].sort((a,b)=>(DIDX[a.region]??99)-(DIDX[b.region]??99)||a.name.localeCompare(b.name)).forEach(p=>{const z=DISTRICTS[DIDX[p.region]]?.zone;if(z&&z!==cz){cz=z;html+=`<div class="zone">${esc(z)}</div>`}if(p.region!==cur){cur=p.region;html+=`<div class="group">${esc(cur)}</div>`}html+=itemHTML(p)})}
   else{const s=[...v];if(state.sort==="near")s.sort((a,b)=>a.homeKm-b.homeKm);if(state.sort==="rating")s.sort((a,b)=>(b.rating||0)-(a.rating||0)||(b.reviews-a.reviews));if(state.sort==="new")s.sort((a,b)=>(b.isNew?1:0)-(a.isNew?1:0));html=s.map(itemHTML).join("")}
   $("#list").innerHTML=html||`<div class="empty">Ничего не нашлось. Попробуйте сбросить фильтры.</div>`;
   if(fit&&v.length)map.flyToBounds(L.latLngBounds(v.map(p=>[p.lat,p.lng])).pad(.2),Object.assign({duration:.6,maxZoom:13},isPhone()?padFor(sMode==="peek"?"peek":"half"):{paddingTopLeft:[420,60]}));
@@ -1862,14 +1863,14 @@ function pcard(p,o={}){const km=kmFromMe(p),oi=openInfo(p);
 document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b&&!b.closest("#list")){e.preventDefault();goToPlace(+b.dataset.go)}});
 
 /* ---------- catalog «Места» ---------- */
-const TAGN={"закат":"На закат","рассвет":"На рассвет","без толп":"Без толп","дождь":"Если дождь","купание":"Искупаться","треккинг":"Прогулки и треккинг","работа":"Кафе для работы","романтика":"Романтика","с детьми":"С детьми","бюджет":"Бесплатно и недорого"};
+const TAGN={"фрукты":"Собрать фрукты","закат":"На закат","рассвет":"На рассвет","без толп":"Без толп","дождь":"Если дождь","купание":"Искупаться","треккинг":"Прогулки и треккинг","работа":"Кафе для работы","романтика":"Романтика","с детьми":"С детьми","бюджет":"Бесплатно и недорого"};
 const byRating=(a,b)=>(b.rating||0)-(a.rating||0)||(b.reviews||0)-(a.reviews||0);
 // photo quality first (2 good, 1 ok, 0 weak photo), then rating — keeps the catalog front page beautiful
 const byLook=(a,b)=>(b.img?(b.pq??1):-1)-(a.img?(a.pq??1):-1)||byRating(a,b);
 function collections(){const C=[];
   if(me&&me.bali)C.push({k:"near",t:"Рядом с вами",ps:[...PLACES].sort((a,b)=>kmFromMe(a)-kmFromMe(b)).slice(0,12),keepOrder:1});
   const open=PLACES.filter(p=>openInfo(p)?.open);if(open.length)C.push({k:"open",t:"Открыто сейчас",ps:open});
-  ["закат","без толп","дождь","купание","работа","треккинг","романтика","с детьми","рассвет"].forEach(t=>{const ps=PLACES.filter(p=>(p.tags||[]).includes(t));if(ps.length>=3)C.push({k:"tag:"+t,t:TAGN[t],ps})});
+  ["закат","без толп","фрукты","дождь","купание","работа","треккинг","романтика","с детьми","рассвет"].forEach(t=>{const ps=PLACES.filter(p=>(p.tags||[]).includes(t));if(ps.length>=3)C.push({k:"tag:"+t,t:TAGN[t],ps})});
   C.push({k:"top",t:"Лучшие по отзывам",ps:PLACES.filter(p=>p.rating>=4.7&&p.reviews>=300)});
   const nw=PLACES.filter(p=>p.isNew);if(nw.length)C.push({k:"new",t:"Новые места",ps:nw});
   C.push({k:"free",t:"Бесплатно",ps:PLACES.filter(p=>p.level===0)});
