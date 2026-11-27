@@ -1,5 +1,5 @@
 // Offline support. Bump VERSION whenever index.html, vendor files or data change.
-const VERSION = "bali-2026-11-17-v2.0";
+const VERSION = "bali-2026-11-27-cinze";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "vendor/leaflet.js", "vendor/leaflet.markercluster.js",
   "data/places.enc.json", "icons/icon-192.png", "icons/icon-512.png"];
 const TILES = "bali-tiles";   // map tiles you have viewed, kept across versions
